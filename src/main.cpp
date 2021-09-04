@@ -1,12 +1,20 @@
 #include <Arduino.h>
-#include <WiFi.h>
-#include <esp_now.h>
 
 #include "ControlStick.h"
 
 #define Debug
 controlstick::ControlStick Sticks;
 controlstick::BothHandsData_t BothHandsData;
+
+uint8_t LeftHalfAddress[] = {0xEC, 0x94, 0xCB, 0x6E, 0x29, 0x70};
+
+void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status) {
+#ifdef Debug
+  Serial.print("\r\nLast Packet Send Status:\t");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success"
+                                                : "Delivery Fail");
+#endif
+}
 
 void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
   memcpy(&BothHandsData, incomingData, sizeof(BothHandsData));
@@ -20,9 +28,22 @@ void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
 #endif
 }
 
+void RightArmUpdate();
+void LeftArmUpdate();
+
 void setup() {
+  Sticks.ThisSends2Stick(LeftHalfAddress, SendCB);
   Sticks.ThisReceives(RecvCB);
   Sticks.SetupConnection();
 }
 
-void loop() {}
+void loop() {
+  RightArmUpdate();
+  LeftArmUpdate();
+}
+
+void RightArmUpdate(){
+
+}
+
+void LeftArmUpdate() { Sticks.SendData2Stick(BothHandsData.LeftStick); }
