@@ -38,7 +38,7 @@ controlstick::ControlStick Sticks;
 controlstick::BothHandsData_t BothHandsData;
 uint8_t LeftHalfAddress[] = {0xEC, 0x94, 0xCB, 0x6E, 0x29, 0x70};
 
-bool IsDirty = false;
+bool IsDirty = false, SwordDrawInProgress = false, SwordDrawCompleted;
 
 AMT102V *ShoulderRoricon, *UpperArmRoricon, *ElbowRoricon;
 
@@ -77,6 +77,8 @@ void LeftArmUpdate();
 
 void UpdateAKIRAMethod();
 void UpdateTaishinMethod();
+
+void SwordDrawingProcedure();
 
 void setup() {
   Sticks.ThisSends2Stick(LeftHalfAddress, SendCB);
@@ -137,6 +139,10 @@ void loop() {
 }
 
 void RightArmUpdate() {
+  if ((BothHandsData.RightStick.ButtonState[4] && !SwordDrawCompleted) ||
+      SwordDrawInProgress)
+    SwordDrawingProcedure();
+
   UpdateAKIRAMethod();
   UpdateTaishinMethod();
 }
@@ -164,5 +170,27 @@ void UpdateAKIRAMethod() {
     if (SensorStates.UpperArmLimits[1])
       analogWrite(Pinmap.UpperArmMotors[1], -UpperArmManipulateValue);
   }
+
+  if (BothHandsData.RightStick.ButtonState[3]) {
+    if (SensorStates.ElbowLimits[0])
+      analogWrite(Pinmap.ElbowMotors[0], MotorPower);
+  } else if (BothHandsData.RightStick.ButtonState[2]) {
+    if (SensorStates.ElbowLimits[1])
+      analogWrite(Pinmap.ElbowMotors[1], -MotorPower);
+  }
+
+  if (SwordDrawCompleted) return;
+  if (BothHandsData.RightStick.ButtonState[1] ||
+      BothHandsData.RightStick.ButtonState[0]) {
+    if (SensorStates.HandLimits[0])
+      analogWrite(Pinmap.HandMotors[0], MotorPower);
+  } else {
+    if (SensorStates.HandLimits[1])
+      analogWrite(Pinmap.HandMotors[1], -MotorPower);
+  }
 }
 void UpdateTaishinMethod() {}
+
+void SwordDrawingProcedure() {
+  ///このモーターをこのくらい動かし、そのモーターをあのくらい動かし、
+}
