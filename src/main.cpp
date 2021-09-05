@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <ESP32Servo.h>
 
 #include "AMT102V.h"
 #include "ControlStick.h"
