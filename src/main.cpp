@@ -19,7 +19,8 @@ typedef struct RightHalfPinmap_t {
   const int ShoulderRoricon[2] = {36, 39};
   const int UpperArmRoricon[2] = {34, 35};
   // max,min
-  const int ShoulderLimits[2] = {23, 22};
+  // const int ShoulderLimits[2] = {23, 22};
+  const int ShoulderLimits = 22;
   const int UpperArmLimits[2] = {1, 3};
 
   const int ElbowRoricon[2] = {21, 19};
@@ -28,8 +29,8 @@ typedef struct RightHalfPinmap_t {
 } RightHalfPinmap_t;
 
 typedef struct RightHalfSensorStates {
-  bool ShoulderLimits[2], UpperArmLimits[2], ElbowLimits[2], HandLimits[2];
-  double ShoulderRotation, UpperArmRotation;
+  bool ShoulderLimits, UpperArmLimits[2], ElbowLimits[2], HandLimits[2];
+  double ShoulderRotationRad, UpperArmRotationRad;
 } RightHalfSensorStates;
 
 RightHalfPinmap_t Pinmap;
@@ -39,7 +40,8 @@ controlstick::ControlStick Sticks;
 controlstick::BothHandsData_t BothHandsData;
 uint8_t LeftHalfAddress[] = {0xEC, 0x94, 0xCB, 0x6E, 0x29, 0x70};
 
-bool IsDirty = false, SwordDrawInProgress = false, SwordDrawCompleted;
+bool IsDirty = false, SwordDrawInProgress = false, SwordDrawCompleted = false;
+bool ShoulderRoriconInitialised = false, UpperArmRoriconInitialised = false;
 
 AMT102V *ShoulderRoricon, *UpperArmRoricon, *ElbowRoricon;
 
@@ -47,6 +49,7 @@ const int MotorPower = 200;
 const double ShoulderReductionRatio = 2 / 9;
 const double UpperArmReductionRatio = 78 / 194;
 const double ElbowArmReductionRatio = 3 / 760;
+const double ShoulderLimitAngleRad[2] = {140 * DEG_TO_RAD, -80 * DEG_TO_RAD};
 
 void ShoulderRoriconInterrupter() { ShoulderRoricon->update(); }
 void UpperArmRoriconInterrupter() { UpperArmRoricon->update(); }
@@ -86,6 +89,7 @@ void setup() {
   Sticks.ThisReceives(RecvCB);
   Sticks.SetupConnection();
 
+  pinMode(Pinmap.ShoulderLimits, INPUT_PULLUP);
   for (int i = 0; i < 2; i++) {
     pinMode(Pinmap.ShoulderMotors[i], OUTPUT);
     pinMode(Pinmap.UpperArmMotors[i], OUTPUT);
@@ -95,7 +99,6 @@ void setup() {
     pinMode(Pinmap.UpperArmRoricon[i], INPUT);
     pinMode(Pinmap.ElbowRoricon[i], INPUT);
 
-    pinMode(Pinmap.ShoulderLimits[i], INPUT_PULLUP);
     pinMode(Pinmap.UpperArmLimits[i], INPUT_PULLUP);
     pinMode(Pinmap.ElbowLimits[i], INPUT_PULLUP);
     pinMode(Pinmap.HandLimits[i], INPUT_PULLUP);
@@ -124,14 +127,22 @@ void setup() {
 
 void loop() {
   for (int i = 0; i < 2; i++) {
-    SensorStates.ShoulderLimits[i] = digitalRead(Pinmap.ShoulderLimits[i]);
+    SensorStates.ShoulderLimits = digitalRead(Pinmap.ShoulderLimits);
     SensorStates.UpperArmLimits[i] = digitalRead(Pinmap.UpperArmLimits[i]);
   }
-  SensorStates.ShoulderRotation =
-      ShoulderRoricon->getRotationsDouble() / ShoulderReductionRatio;
-  SensorStates.UpperArmRotation =
-      UpperArmRoricon->getRotationsDouble() / UpperArmReductionRatio;
+  if (SensorStates.ShoulderLimits) {
+    ShoulderRoriconInitialised = true;
+    ShoulderRoricon->resetRotation();
+  }
 
+  if (ShoulderRoriconInitialised)
+    SensorStates.ShoulderRotationRad =
+        (ShoulderRoricon->getRotationsDouble() / ShoulderReductionRatio) * 2 *
+        PI;
+  if (UpperArmRoriconInitialised)
+    SensorStates.UpperArmRotationRad =
+        (UpperArmRoricon->getRotationsDouble() / UpperArmReductionRatio) * 2 *
+        PI;
   if (IsDirty) {
     RightArmUpdate();
     LeftArmUpdate();
@@ -157,18 +168,18 @@ void UpdateAKIRAMethod() {
                                    BothHandsData.RightStick.Slider * MotorPower;
 
   if (ShoulderManipulateValue > 0) {
-    if (SensorStates.ShoulderLimits[0])
+    if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0])
       analogWrite(Pinmap.ShoulderMotors[0], ShoulderManipulateValue);
   } else {
-    if (SensorStates.ShoulderLimits[1])
+    if (ShoulderLimitAngleRad[1] < SensorStates.ShoulderRotationRad)
       analogWrite(Pinmap.ShoulderMotors[1], -ShoulderManipulateValue);
   }
 
   if (UpperArmManipulateValue > 0) {
-    if (SensorStates.UpperArmLimits[0])
+    if (!SensorStates.UpperArmLimits[0])
       analogWrite(Pinmap.UpperArmMotors[0], UpperArmManipulateValue);
   } else {
-    if (SensorStates.UpperArmLimits[1])
+    if (!SensorStates.UpperArmLimits[1])
       analogWrite(Pinmap.UpperArmMotors[1], -UpperArmManipulateValue);
   }
 
