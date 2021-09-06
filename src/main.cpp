@@ -79,6 +79,8 @@ void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
 void RightArmUpdate();
 void LeftArmUpdate();
 
+void UpdateTestDummy(double *ShoulderManipulateValue,
+                       double *UpperArmManipulateValue);
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue);
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
@@ -136,6 +138,10 @@ void loop() {
     ShoulderRoriconInitialised = true;
     ShoulderRoricon->resetRotation();
   }
+  if (SensorStates.UpperArmLimits[1]) {
+    UpperArmRoriconInitialised = true;
+    UpperArmRoricon->resetRotation();
+  }
 
   if (ShoulderRoriconInitialised)
     SensorStates.ShoulderRotationRad =
@@ -145,6 +151,7 @@ void loop() {
     SensorStates.UpperArmRotationRad =
         (UpperArmRoricon->getRotationsDouble() / UpperArmReductionRatio) * 2 *
         PI;
+
   if (IsDirty) {
     RightArmUpdate();
     LeftArmUpdate();
@@ -158,8 +165,9 @@ void RightArmUpdate() {
       SwordDrawInProgress)
     SwordDrawingProcedure();
 
+  UpdateTestDummy(&UpperArmManipulateValue, &UpperArmManipulateValue);
   UpdateAKIRAMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);
-  UpdateTaishinMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);
+  // UpdateTaishinMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);
 
   if (ShoulderManipulateValue > 0) {
     if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0])
@@ -179,6 +187,12 @@ void RightArmUpdate() {
 }
 
 void LeftArmUpdate() { Sticks.SendData2Stick(BothHandsData.LeftStick); }
+
+// void UpdateTestDummy(double *ShoulderManipulateValue,
+//                        double *UpperArmManipulateValue) {
+//                          if(ShoulderRoriconInitialised){
+//   *ShoulderManipulateValue = MotorPower;
+//                        }}
 
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue) {
