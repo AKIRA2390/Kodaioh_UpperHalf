@@ -79,8 +79,10 @@ void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
 void RightArmUpdate();
 void LeftArmUpdate();
 
-void UpdateAKIRAMethod();
-void UpdateTaishinMethod();
+void UpdateAKIRAMethod(double *ShoulderManipulateValue,
+                       double *UpperArmManipulateValue);
+void UpdateTaishinMethod(double *ShoulderManipulateValue,
+                         double *UpperArmManipulateValue);
 
 void SwordDrawingProcedure();
 
@@ -151,21 +153,13 @@ void loop() {
 }
 
 void RightArmUpdate() {
+  double ShoulderManipulateValue, UpperArmManipulateValue;
   if ((BothHandsData.RightStick.ButtonState[4] && !SwordDrawCompleted) ||
       SwordDrawInProgress)
     SwordDrawingProcedure();
 
-  UpdateAKIRAMethod();
-  UpdateTaishinMethod();
-}
-
-void LeftArmUpdate() { Sticks.SendData2Stick(BothHandsData.LeftStick); }
-
-void UpdateAKIRAMethod() {
-  double ShoulderManipulateValue = BothHandsData.RightStick.StickStates[0] *
-                                   BothHandsData.RightStick.Slider * MotorPower,
-         UpperArmManipulateValue = BothHandsData.RightStick.StickStates[1] *
-                                   BothHandsData.RightStick.Slider * MotorPower;
+  UpdateAKIRAMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);
+  UpdateTaishinMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);
 
   if (ShoulderManipulateValue > 0) {
     if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0])
@@ -182,6 +176,16 @@ void UpdateAKIRAMethod() {
     if (!SensorStates.UpperArmLimits[1])
       analogWrite(Pinmap.UpperArmMotors[1], -UpperArmManipulateValue);
   }
+}
+
+void LeftArmUpdate() { Sticks.SendData2Stick(BothHandsData.LeftStick); }
+
+void UpdateAKIRAMethod(double *ShoulderManipulateValue,
+                       double *UpperArmManipulateValue) {
+  *ShoulderManipulateValue = BothHandsData.RightStick.StickStates[0] *
+                             BothHandsData.RightStick.Slider * MotorPower;
+  *UpperArmManipulateValue = BothHandsData.RightStick.StickStates[1] *
+                             BothHandsData.RightStick.Slider * MotorPower;
 
   if (BothHandsData.RightStick.ButtonState[3]) {
     if (SensorStates.ElbowLimits[0])
@@ -201,7 +205,8 @@ void UpdateAKIRAMethod() {
       analogWrite(Pinmap.HandMotors[1], -MotorPower);
   }
 }
-void UpdateTaishinMethod() {}
+void UpdateTaishinMethod(double *ShoulderManipulateValue,
+                         double *UpperArmManipulateValue) {}
 
 void SwordDrawingProcedure() {
   ///このモーターをこのくらい動かし、そのモーターをあのくらい動かし、
