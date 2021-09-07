@@ -188,11 +188,11 @@ void RightArmUpdate() {
 
 void LeftArmUpdate() { Sticks.SendData2Stick(BothHandsData.LeftStick); }
 
-// void UpdateTestDummy(double *ShoulderManipulateValue,
-//                        double *UpperArmManipulateValue) {
-//                          if(ShoulderRoriconInitialised){
-//   *ShoulderManipulateValue = MotorPower;
-//                        }}
+void UpdateTestDummy(double *ShoulderManipulateValue,
+                       double *UpperArmManipulateValue) {
+                         if(ShoulderRoriconInitialised){
+  *ShoulderManipulateValue = MotorPower;
+                       }}
 
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue) {
