@@ -41,7 +41,8 @@ controlstick::BothHandsData_t BothHandsData;
 uint8_t LeftHalfAddress[] = {0xEC, 0x94, 0xCB, 0x6E, 0x29, 0x70};
 
 bool IsDirty = false, SwordDrawInProgress = false, SwordDrawCompleted = false;
-bool ShoulderRoriconInitialised = false, UpperArmRoriconInitialised = false;
+bool ShoulderRoriconInitialised = false, UpperArmRoriconInitialised = false,
+     ElbowRoriconInitialised = false;
 
 AMT102V *ShoulderRoricon, *UpperArmRoricon, *ElbowRoricon;
 
@@ -79,10 +80,13 @@ void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
 void RightArmUpdate();
 void LeftArmUpdate();
 
-void UpdateTestDummy(double *ShoulderManipulateValue,
-                       double *UpperArmManipulateValue);
-void UpdateAKIRAMethod(double *ShoulderManipulateValue,
-                       double *UpperArmManipulateValue);
+void UpdateTestDummy(
+    double *ShoulderManipulateValue, double *UpperArmManipulateValue,
+    double *
+        ElbowManipulateValue) void UpdateAKIRAMethod(double *
+                                                         ShoulderManipulateValue,
+                                                     double *
+                                                         UpperArmManipulateValue);
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue);
 
@@ -142,6 +146,10 @@ void loop() {
     UpperArmRoriconInitialised = true;
     UpperArmRoricon->resetRotation();
   }
+  if (SensorStates.ElbowLimits[1]) {
+    ElbowRoriconInitialised = true;
+    ElbowRoricon->resetRotation();
+  }
 
   if (ShoulderRoriconInitialised)
     SensorStates.ShoulderRotationRad =
@@ -160,13 +168,14 @@ void loop() {
 }
 
 void RightArmUpdate() {
-  double ShoulderManipulateValue, UpperArmManipulateValue;
+  double ShoulderManipulateValue, UpperArmManipulateValue, ElbowManipulateValue;
   if ((BothHandsData.RightStick.ButtonState[4] && !SwordDrawCompleted) ||
       SwordDrawInProgress)
     SwordDrawingProcedure();
 
-  UpdateTestDummy(&UpperArmManipulateValue, &UpperArmManipulateValue);
-  UpdateAKIRAMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);
+  UpdateTestDummy(&UpperArmManipulateValue, &UpperArmManipulateValue,
+                  &ElbowManipulateValue);
+  // UpdateAKIRAMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);
   // UpdateTaishinMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);
 
   if (ShoulderManipulateValue > 0) {
@@ -184,15 +193,95 @@ void RightArmUpdate() {
     if (!SensorStates.UpperArmLimits[1])
       analogWrite(Pinmap.UpperArmMotors[1], -UpperArmManipulateValue);
   }
+
+  if (ElbowManipulateValue > 0) {
+    if (!SensorStates.ElbowLimits[0])
+      analogWrite(Pinmap.ElbowMotors[0], ElbowManipulateValue);
+  } else {
+    if (!SensorStates.ElbowLimits[1])
+      analogWrite(Pinmap.ElbowMotors[1], -ElbowManipulateValue);
+  }
 }
 
 void LeftArmUpdate() { Sticks.SendData2Stick(BothHandsData.LeftStick); }
 
 void UpdateTestDummy(double *ShoulderManipulateValue,
-                       double *UpperArmManipulateValue) {
-                         if(ShoulderRoriconInitialised){
-  *ShoulderManipulateValue = MotorPower;
-                       }}
+                     double *UpperArmManipulateValue,
+                     double *ElbowManipulateValue) {
+  const bool ShoulderTesting = true, UpperArmTesting = false,
+             ElbowTesting = false, HandTesting = flase;
+  static bool ShoulderDirection = true, UpperArmDirection = true,
+              ElbowDirection = true, HandDirection = true;
+
+  if (SensorStates.ShoulderLimits[0]) {
+    ShoulderDirection = false;
+  } else if (SensorStates.ShoulderLimits[1]) {
+    ShoulderDirection = true;
+  }
+  if (SensorStates.UpperArmLimits[0]) {
+    UpperArmDirection = false;
+  } else if (SensorStates.UpperArmLimits[1]) {
+    UpperArmDirection = true;
+  }
+  if (SensorStates.ElbowLimits[0]) {
+    ElbowDirection = false;
+  } else if (SensorStates.ElbowLimits[1]) {
+    ElbowDirection = true;
+  }
+
+  if (ShoulderRoriconInitialised && ShoulderTesting) {
+    if (ShoulderDirection) {
+      *ShoulderManipulateValue =
+          MotorPower *
+          ((ShoulderLimitAngleRad[0] - SensorStates.ShoulderRotationRad) /
+           ShoulderLimitAngleRad[0]);
+    } else {
+      *ShoulderManipulateValue =
+          -MotorPower *
+          ((ShoulderLimitAngleRad[1] - SensorStates.ShoulderRotationRad) /
+           ShoulderLimitAngleRad[0]);
+    }
+  }
+  if (UpperArmRoriconInitialised && UpperArmTesting) {
+    if (UpperArmDirection) {
+      *UpperArmManipulateValue =
+          MotorPower *
+          ((UpperArmLimitAngleRad[0] - SensorStates.UpperArmRotationRad) /
+           UpperArmLimitAngleRad[0]);
+    } else {
+      *UpperArmManipulateValue =
+          -MotorPower *
+          ((UpperArmLimitAngleRad[1] - SensorStates.UpperArmRotationRad) /
+           UpperArmLimitAngleRad[0]);
+    }
+  }
+  if (ElbowRoriconInitialised && ElbowTesting) {
+    if (ElbowDirection) {
+      *ElbowManipulateValue =
+          MotorPower *
+          ((ElbowLimitAngleRad[0] - SensorStates.ElbowRotationRad) /
+           ElbowLimitAngleRad[0]);
+    } else {
+      *ElbowManipulateValue =
+          -MotorPower *
+          ((ElbowLimitAngleRad[1] - SensorStates.ElbowRotationRad) /
+           ElbowLimitAngleRad[0]);
+    }
+  }
+  // if (HandRoriconInitialised&&HandTesting) {
+  //   if (HandDirection) {
+  //     *HandManipulateValue =
+  //         MotorPower *
+  //         ((HandLimitAngleRad[0] - SensorStates.HandRotationRad) /
+  //          HandLimitAngleRad[0]);
+  //   } else {
+  //     *HandManipulateValue =
+  //         -MotorPower *
+  //         ((HandLimitAngleRad[1] - SensorStates.HandRotationRad) /
+  //          HandLimitAngleRad[0]);
+  //   }
+  // }
+}
 
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue) {
