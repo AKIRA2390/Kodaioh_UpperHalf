@@ -30,7 +30,7 @@ typedef struct RightHalfPinmap_t {
 
 typedef struct RightHalfSensorStates {
   bool ShoulderLimits, UpperArmLimits[2], ElbowLimits[2], HandLimits[2];
-  double ShoulderRotationRad, UpperArmRotationRad;
+  double ShoulderRotationRad, UpperArmRotationRad, ElbowRotationRad;
 } RightHalfSensorStates;
 
 RightHalfPinmap_t Pinmap;
@@ -49,8 +49,10 @@ AMT102V *ShoulderRoricon, *UpperArmRoricon, *ElbowRoricon;
 const int MotorPower = 200;
 const double ShoulderReductionRatio = 2 / 9;
 const double UpperArmReductionRatio = 78 / 194;
-const double ElbowArmReductionRatio = 3 / 760;
+const double ElbowReductionRatio = 3 / 760;
 const double ShoulderLimitAngleRad[2] = {140 * DEG_TO_RAD, -80 * DEG_TO_RAD};
+const double UpperArmLimitAngleRad[2] = {90 * DEG_TO_RAD, 0 * DEG_TO_RAD};
+const double ElbowLimitAngleRad[2] = {90 * DEG_TO_RAD, 0 * DEG_TO_RAD};
 
 void ShoulderRoriconInterrupter() { ShoulderRoricon->update(); }
 void UpperArmRoriconInterrupter() { UpperArmRoricon->update(); }
@@ -80,13 +82,11 @@ void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
 void RightArmUpdate();
 void LeftArmUpdate();
 
-void UpdateTestDummy(
-    double *ShoulderManipulateValue, double *UpperArmManipulateValue,
-    double *
-        ElbowManipulateValue) void UpdateAKIRAMethod(double *
-                                                         ShoulderManipulateValue,
-                                                     double *
-                                                         UpperArmManipulateValue);
+void UpdateTestDummy(double *ShoulderManipulateValue,
+                     double *UpperArmManipulateValue,
+                     double *ElbowManipulateValue);
+void UpdateAKIRAMethod(double *ShoulderManipulateValue,
+                       double *UpperArmManipulateValue);
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue);
 
@@ -137,6 +137,7 @@ void loop() {
   for (int i = 0; i < 2; i++) {
     SensorStates.ShoulderLimits = digitalRead(Pinmap.ShoulderLimits);
     SensorStates.UpperArmLimits[i] = digitalRead(Pinmap.UpperArmLimits[i]);
+    SensorStates.ElbowLimits[i] = digitalRead(Pinmap.ElbowLimits[i]);
   }
   if (SensorStates.ShoulderLimits) {
     ShoulderRoriconInitialised = true;
@@ -159,9 +160,19 @@ void loop() {
     SensorStates.UpperArmRotationRad =
         (UpperArmRoricon->getRotationsDouble() / UpperArmReductionRatio) * 2 *
         PI;
+  if (ElbowRoriconInitialised)
+    SensorStates.ElbowRotationRad =
+        (ElbowRoricon->getRotationsDouble() / ElbowReductionRatio) * 2 * PI;
+  Serial.print("Shoulder Rotation:");
+  Serial.println(SensorStates.ShoulderRotationRad*RAD_TO_DEG);
+  Serial.print("UpperArm Rotation:");
+  Serial.println(SensorStates.UpperArmRotationRad*RAD_TO_DEG);
+  Serial.print("Elbow Rotation:");
+  Serial.println(SensorStates.ElbowRotationRad*RAD_TO_DEG);
+  Serial.println("\n");
 
+  RightArmUpdate();
   if (IsDirty) {
-    RightArmUpdate();
     LeftArmUpdate();
     IsDirty = false;
   }
@@ -209,13 +220,13 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue,
                      double *ElbowManipulateValue) {
   const bool ShoulderTesting = true, UpperArmTesting = false,
-             ElbowTesting = false, HandTesting = flase;
+             ElbowTesting = false, HandTesting = false;
   static bool ShoulderDirection = true, UpperArmDirection = true,
               ElbowDirection = true, HandDirection = true;
 
-  if (SensorStates.ShoulderLimits[0]) {
+  if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0]) {
     ShoulderDirection = false;
-  } else if (SensorStates.ShoulderLimits[1]) {
+  } else if (ShoulderLimitAngleRad[1] < SensorStates.ShoulderRotationRad) {
     ShoulderDirection = true;
   }
   if (SensorStates.UpperArmLimits[0]) {
