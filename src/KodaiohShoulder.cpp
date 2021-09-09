@@ -116,6 +116,8 @@ void update() {
   Serial.println(SensorStates.ElbowRotationRad * RAD_TO_DEG);
   Serial.println("\n");
 #endif
+}
+void UpdateWhenDirty(){
   if (IsDirty) {
     double ShoulderManipulateValue, UpperArmManipulateValue;
     UpdateAKIRAMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);

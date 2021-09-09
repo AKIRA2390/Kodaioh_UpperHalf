@@ -91,6 +91,7 @@ void loop() {
 
   RightArmUpdate();
   if (kodaioh_shoulder::IsDirty) {
+  kodaioh_shoulder::UpdateWhenDirty();
     LeftArmUpdate();
     kodaioh_shoulder::IsDirty = false;
   }
@@ -126,7 +127,7 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
 
   kodaioh_shoulder::UpdateTestDummy(UpperArmManipulateValue,
                                     UpperArmManipulateValue);
-                                    
+
   if (SensorStates.ElbowLimits[0]) {
     ElbowDirection = false;
   } else if (SensorStates.ElbowLimits[1]) {
