@@ -25,11 +25,11 @@ typedef struct RightHalfPinmap_t {
 
   const int ElbowRoricon[2] = {21, 19};
   const int ElbowLimits[2] = {18, 17};
-  // const int HandLimits[2] = {16, 4};
+  const int HandLimits[2] = {16, 4};
 } RightHalfPinmap_t;
 
 typedef struct RightHalfSensorStates {
-  // bool ShoulderLimits, UpperArmLimits[2], ElbowLimits[2], HandLimits[2];
+  bool ShoulderLimits, UpperArmLimits[2], ElbowLimits[2], HandLimits[2];
   double ShoulderRotationRad, UpperArmRotationRad, ElbowRotationRad;
 } RightHalfSensorStates;
 
@@ -37,7 +37,7 @@ RightHalfPinmap_t Pinmap;
 RightHalfSensorStates SensorStates;
 
 controlstick::ControlStick Sticks;
-// // controlstick::BothHandsData_t BothHandsData;
+controlstick::BothHandsData_t BothHandsData;
 uint8_t LeftHalfAddress[] = {0xEC, 0x94, 0xCB, 0x6E, 0x29, 0x70};
 
 bool IsDirty = false, SwordDrawInProgress = false, SwordDrawCompleted = false;
@@ -67,14 +67,14 @@ void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status) {
 }
 
 void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
-  // // memcpy(&BothHandsData, incomingData, sizeof(BothHandsData));
+  memcpy(&BothHandsData, incomingData, sizeof(BothHandsData));
   IsDirty = true;
 #ifdef Debug
   Serial.println("Data Received!");
-  // // // Serial.println("Right Hand\tRight Hand\tRight Hand\t");
-  // Sticks.DumpData(BothHandsData.RightStick);
-  // // // Serial.println("Left Hand\tLeft Hand\tLeft Hand\t");
-  // Sticks.DumpData(BothHandsData.LeftStick);
+  Serial.println("Right Hand\tRight Hand\tRight Hand\t");
+  Sticks.DumpData(BothHandsData.RightStick);
+  Serial.println("Left Hand\tLeft Hand\tLeft Hand\t");
+  Sticks.DumpData(BothHandsData.LeftStick);
   Serial.println("\n");
 #endif
 }
@@ -109,7 +109,7 @@ void setup() {
 
     pinMode(Pinmap.UpperArmLimits[i], INPUT_PULLUP);
     pinMode(Pinmap.ElbowLimits[i], INPUT_PULLUP);
-    // pinMode(Pinmap.HandLimits[i], INPUT_PULLUP);
+    pinMode(Pinmap.HandLimits[i], INPUT_PULLUP);
   }
   ShoulderRoricon =
       new AMT102V(Pinmap.ShoulderRoricon[0], Pinmap.ShoulderRoricon[1]);
@@ -180,7 +180,7 @@ void loop() {
 
 void RightArmUpdate() {
   double ShoulderManipulateValue, UpperArmManipulateValue, ElbowManipulateValue;
-  // if ((BothHandsData.RightStick.ButtonState[4] && !SwordDrawCompleted) ||
+  if ((BothHandsData.RightStick.ButtonState[4] && !SwordDrawCompleted) ||
       SwordDrawInProgress)
     SwordDrawingProcedure();
 
@@ -214,15 +214,15 @@ void RightArmUpdate() {
   }
 }
 
-// void LeftArmUpdate() { Sticks.SendData2Stick(BothHandsData.LeftStick); }
+void LeftArmUpdate() { Sticks.SendData2Stick(BothHandsData.LeftStick); }
 
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue,
                      double *ElbowManipulateValue) {
   const bool ShoulderTesting = true, UpperArmTesting = false,
-            //  ElbowTesting = false, HandTesting = false;
+             ElbowTesting = false, HandTesting = false;
   static bool ShoulderDirection = true, UpperArmDirection = true,
-              // ElbowDirection = true, HandDirection = true;
+              ElbowDirection = true, HandDirection = true;
 
   if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0]) {
     ShoulderDirection = false;
@@ -279,44 +279,44 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
            ElbowLimitAngleRad[0]);
     }
   }
-  if (HandRoriconInitialised&&HandTesting) {
-    if (HandDirection) {
-      *HandManipulateValue =
+  // if (HandRoriconInitialised&&HandTesting) {
+  //   if (HandDirection) {
+  //     *HandManipulateValue =
   //         MotorPower *
-          ((HandLimitAngleRad[0] - SensorStates.HandRotationRad) /
-           HandLimitAngleRad[0]);
+  //         ((HandLimitAngleRad[0] - SensorStates.HandRotationRad) /
+  //          HandLimitAngleRad[0]);
   //   } else {
-      *HandManipulateValue =
+  //     *HandManipulateValue =
   //         -MotorPower *
-          ((HandLimitAngleRad[1] - SensorStates.HandRotationRad) /
-           HandLimitAngleRad[0]);
+  //         ((HandLimitAngleRad[1] - SensorStates.HandRotationRad) /
+  //          HandLimitAngleRad[0]);
   //   }
   // }
 }
 
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue) {
-  // *ShoulderManipulateValue = BothHandsData.RightStick.StickStates[0] *
-                            //  BothHandsData.RightStick.Slider * MotorPower;
-  // *UpperArmManipulateValue = BothHandsData.RightStick.StickStates[1] *
-                            //  BothHandsData.RightStick.Slider * MotorPower;
+  *ShoulderManipulateValue = BothHandsData.RightStick.StickStates[0] *
+                             BothHandsData.RightStick.Slider * MotorPower;
+  *UpperArmManipulateValue = BothHandsData.RightStick.StickStates[1] *
+                             BothHandsData.RightStick.Slider * MotorPower;
 
-  // if (BothHandsData.RightStick.ButtonState[3]) {
+  if (BothHandsData.RightStick.ButtonState[3]) {
     if (SensorStates.ElbowLimits[0])
       analogWrite(Pinmap.ElbowMotors[0], MotorPower);
-  // } else if (BothHandsData.RightStick.ButtonState[2]) {
+  } else if (BothHandsData.RightStick.ButtonState[2]) {
     if (SensorStates.ElbowLimits[1])
       analogWrite(Pinmap.ElbowMotors[1], -MotorPower);
   }
 
   if (SwordDrawCompleted) return;
-  // if (BothHandsData.RightStick.ButtonState[1] ||
-      // BothHandsData.RightStick.ButtonState[0]) {
-    // if (SensorStates.HandLimits[0])
-      // analogWrite(Pinmap.HandMotors[0], MotorPower);
+  if (BothHandsData.RightStick.ButtonState[1] ||
+      BothHandsData.RightStick.ButtonState[0]) {
+    if (SensorStates.HandLimits[0])
+      analogWrite(Pinmap.HandMotors[0], MotorPower);
   } else {
-    // if (SensorStates.HandLimits[1])
-      // analogWrite(Pinmap.HandMotors[1], -MotorPower);
+    if (SensorStates.HandLimits[1])
+      analogWrite(Pinmap.HandMotors[1], -MotorPower);
   }
 }
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
