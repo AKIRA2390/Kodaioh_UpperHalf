@@ -22,7 +22,7 @@
     "export": {
         "include": [
             "library.json",
-            "src/KodaiohShoulderUnit.*"
+            "src/KodaiohShoulder.*"
         ]
     }
 }

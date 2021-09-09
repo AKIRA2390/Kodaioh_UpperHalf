@@ -9,7 +9,7 @@
 
 typedef struct RightHalfPinmap_t {
   // output pins //
-  // // plus, minus
+  // plus, minus
   const int ElbowMotors[2] = {27, 14};
   const int HandMotors[2] = {9, 10};
 
@@ -32,8 +32,8 @@ controlstick::ControlStick Sticks;
 controlstick::BothHandsData_t BothHandsData;
 uint8_t LeftHalfAddress[] = {0xEC, 0x94, 0xCB, 0x6E, 0x29, 0x70};
 
-bool SwordDrawInProgress = false, SwordDrawCompleted = false;
 bool ElbowRoriconInitialised = false;
+bool SwordDrawInProgress = false, SwordDrawCompleted = false;
 
 AMT102V *ElbowRoricon;
 
@@ -59,7 +59,9 @@ void setup() {
   Sticks.ThisSends2Robot(LeftHalfAddress, kodaioh_shoulder::SendCB);
   Sticks.ThisReceives(kodaioh_shoulder::RecvCB);
   Sticks.SetupConnection();
+
   kodaioh_shoulder::setup(&Sticks, &BothHandsData.RightStick);
+
   for (int i = 0; i < 2; i++) {
     pinMode(Pinmap.ElbowMotors[i], OUTPUT);
 
@@ -86,6 +88,7 @@ void loop() {
         (ElbowRoricon->getRotationsDouble() / ElbowReductionRatio) * 2 * PI;
 
   kodaioh_shoulder::update();
+
   RightArmUpdate();
   if (kodaioh_shoulder::IsDirty) {
     LeftArmUpdate();
@@ -96,6 +99,7 @@ void loop() {
 void RightArmUpdate() {
   double ShoulderManipulateValue, UpperArmManipulateValue;
   double ElbowManipulateValue;
+
   if ((BothHandsData.RightStick.ButtonState[4] && !SwordDrawCompleted) ||
       SwordDrawInProgress)
     SwordDrawingProcedure();
@@ -119,8 +123,10 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *ElbowManipulateValue) {
   const bool ElbowTesting = false, HandTesting = false;
   static bool ElbowDirection = true, HandDirection = true;
+
   kodaioh_shoulder::UpdateTestDummy(UpperArmManipulateValue,
                                     UpperArmManipulateValue);
+                                    
   if (SensorStates.ElbowLimits[0]) {
     ElbowDirection = false;
   } else if (SensorStates.ElbowLimits[1]) {
@@ -166,7 +172,10 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
   }
 }
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
-                         double *UpperArmManipulateValue) {}
+                         double *UpperArmManipulateValue) {
+  kodaioh_shoulder::UpdateTaishinMethod(UpperArmManipulateValue,
+                                      UpperArmManipulateValue);
+                         }
 
 void SwordDrawingProcedure() {
   ///このモーターをこのくらい動かし、そのモーターをあのくらい動かし、
