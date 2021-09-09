@@ -1,0 +1,28 @@
+{
+    "name": "KodaiohShoulder",
+    "version": "1.0.0",
+    "description": "codes to use Kohdaioh Shoulder",
+    "keywords": "Kohdaioh, esp32, esp-now",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/AKIRA2390/Kodaioh_UpperHalf"
+    },
+    "authors": [
+        {
+            "name": "akira2390"
+        }
+    ],
+    "dependencies": {
+        "AMR102V": "https://github.com/AKIRA2390/AMT102V",
+        "ControlStick": "https://github.com/AKIRA2390/ControlStick",
+        "ESP32Servo": "*"
+    },
+    "frameworks": "*",
+    "platforms": "*",
+    "export": {
+        "include": [
+            "library.json",
+            "src/KodaiohShoulderUnit.*"
+        ]
+    }
+}
