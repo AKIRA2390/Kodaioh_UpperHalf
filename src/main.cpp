@@ -58,9 +58,8 @@ void SwordDrawingProcedure();
 void setup() {
   Sticks.ThisSends2Robot(LeftHalfAddress, kodaioh_shoulder::SendCB);
   Sticks.ThisReceives(kodaioh_shoulder::RecvCB);
-  Sticks.SetupConnection();
 
-  kodaioh_shoulder::setup(&Sticks,&BothHandsData, &BothHandsData.RightStick);
+  kodaioh_shoulder::setup(&Sticks, &BothHandsData, &BothHandsData.RightStick);
 
   for (int i = 0; i < 2; i++) {
     pinMode(Pinmap.ElbowMotors[i], OUTPUT);
@@ -89,9 +88,11 @@ void loop() {
 
   kodaioh_shoulder::update();
 
+  Sticks.SendData2Robot(BothHandsData);
+
   RightArmUpdate();
   if (kodaioh_shoulder::IsDirty) {
-  kodaioh_shoulder::UpdateWhenDirty();
+    kodaioh_shoulder::UpdateWhenDirty();
     LeftArmUpdate();
     kodaioh_shoulder::IsDirty = false;
   }
@@ -175,8 +176,8 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue) {
   kodaioh_shoulder::UpdateTaishinMethod(UpperArmManipulateValue,
-                                      UpperArmManipulateValue);
-                         }
+                                        UpperArmManipulateValue);
+}
 
 void SwordDrawingProcedure() {
   ///このモーターをこのくらい動かし、そのモーターをあのくらい動かし、
