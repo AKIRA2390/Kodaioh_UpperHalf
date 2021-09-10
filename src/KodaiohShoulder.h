@@ -29,7 +29,7 @@ extern Pinmap_t Pinmap;
 extern ShoulderSensorStates SensorStates;
 
 extern controlstick::ControlStick *Stick;
-extern controlstick::BothHandsData_t BothHandsData;
+extern controlstick::BothHandsData_t *BothHandsData;
 extern controlstick::InputData_t *InputData;
 
 extern AMT102V *ShoulderRoricon, *UpperArmRoricon;
@@ -55,6 +55,7 @@ void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue);
 
 void setup(controlstick::ControlStick *stick,
+           controlstick::BothHandsData_t *both_hands_data,
            controlstick::InputData_t *input_data);
 void update();
 

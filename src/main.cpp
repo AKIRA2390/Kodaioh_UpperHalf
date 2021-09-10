@@ -60,7 +60,7 @@ void setup() {
   Sticks.ThisReceives(kodaioh_shoulder::RecvCB);
   Sticks.SetupConnection();
 
-  kodaioh_shoulder::setup(&Sticks, &BothHandsData.RightStick);
+  kodaioh_shoulder::setup(&Sticks,&BothHandsData, &BothHandsData.RightStick);
 
   for (int i = 0; i < 2; i++) {
     pinMode(Pinmap.ElbowMotors[i], OUTPUT);

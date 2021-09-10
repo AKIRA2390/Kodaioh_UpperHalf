@@ -12,7 +12,7 @@ Pinmap_t Pinmap;
 ShoulderSensorStates SensorStates;
 
 controlstick::ControlStick *Stick;
-controlstick::BothHandsData_t BothHandsData;
+controlstick::BothHandsData_t *BothHandsData;
 controlstick::InputData_t *InputData;
 
 const int MotorPower = 200;
@@ -51,9 +51,11 @@ void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
 }
 
 void setup(controlstick::ControlStick *stick,
+           controlstick::BothHandsData_t *both_hands_data,
            controlstick::InputData_t *input_data) {
   Stick = stick;
   InputData = input_data;
+  BothHandsData = both_hands_data;
 
   Stick->ThisReceives(RecvCB);
   Stick->SetupConnection();
@@ -117,7 +119,7 @@ void update() {
   Serial.println("\n");
 #endif
 }
-void UpdateWhenDirty(){
+void UpdateWhenDirty() {
   if (IsDirty) {
     double ShoulderManipulateValue, UpperArmManipulateValue;
     UpdateAKIRAMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);
