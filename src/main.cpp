@@ -11,17 +11,15 @@ typedef struct RightHalfPinmap_t {
   // output pins //
   // plus, minus
   const int ElbowMotors[2] = {27, 14};
-  const int HandMotors[2] = {9, 10};
 
   // input pins //
   const int ElbowRoricon[2] = {21, 19};
   // max,min
   const int ElbowLimits[2] = {18, 17};
-  const int HandLimits[2] = {16, 4};
 } RightHalfPinmap_t;
 
 typedef struct RightHalfSensorStates {
-  bool ElbowLimits[2], HandLimits[2];
+  bool ElbowLimits[2];
   double ElbowRotationRad;
 } RightHalfSensorStates;
 
@@ -67,7 +65,6 @@ void setup() {
     pinMode(Pinmap.ElbowRoricon[i], INPUT);
 
     pinMode(Pinmap.ElbowLimits[i], INPUT_PULLUP);
-    pinMode(Pinmap.HandLimits[i], INPUT_PULLUP);
   }
 
   ElbowRoricon = new AMT102V(Pinmap.ElbowRoricon[0], Pinmap.ElbowRoricon[1]);
@@ -123,8 +120,8 @@ void LeftArmUpdate() { Sticks.SendData2Robot(BothHandsData); }
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue,
                      double *ElbowManipulateValue) {
-  const bool ElbowTesting = false, HandTesting = false;
-  static bool ElbowDirection = true, HandDirection = true;
+  const bool ElbowTesting = false;
+  static bool ElbowDirection = true;
 
   kodaioh_shoulder::UpdateTestDummy(UpperArmManipulateValue,
                                     UpperArmManipulateValue);
@@ -161,16 +158,6 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
   } else if (BothHandsData.RightStick.ButtonState[2]) {
     if (SensorStates.ElbowLimits[1])
       analogWrite(Pinmap.ElbowMotors[1], -kodaioh_shoulder::MotorPower);
-  }
-
-  if (SwordDrawCompleted) return;
-  if (BothHandsData.RightStick.ButtonState[1] ||
-      BothHandsData.RightStick.ButtonState[0]) {
-    if (SensorStates.HandLimits[0])
-      analogWrite(Pinmap.HandMotors[0], kodaioh_shoulder::MotorPower);
-  } else {
-    if (SensorStates.HandLimits[1])
-      analogWrite(Pinmap.HandMotors[1], -kodaioh_shoulder::MotorPower);
   }
 }
 void UpdateTaishinMethod(double *ShoulderManipulateValue,

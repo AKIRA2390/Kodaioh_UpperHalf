@@ -16,7 +16,7 @@ typedef struct Pinmap_t {
   const int UpperArmRoricon[2] = {34, 35};
   // max,min
   // const int ShoulderLimits[2] = {23, 22};
-  const int ShoulderLimits = 22;
+  const int ShoulderLimits = 23;
   const int UpperArmLimits[2] = {12, 13};
 } Pinmap_t;
 
