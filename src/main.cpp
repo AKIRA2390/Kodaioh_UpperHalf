@@ -28,7 +28,9 @@ RightHalfSensorStates SensorStates;
 
 controlstick::ControlStick Sticks;
 controlstick::BothHandsData_t BothHandsData;
-uint8_t LeftHalfAddress[] = {0xEC, 0x94, 0xCB, 0x6E, 0x29, 0x70};
+// uint8_t LeftHalfAddress[] = {0xEC, 0x94, 0xCB, 0x6E, 0x29, 0x70};
+uint8_t LeftHalfAddress[] = {0x24, 0x0A, 0xC4, 0xF9, 0x40, 0xD0};
+
 
 bool ElbowRoriconInitialised = false;
 bool SwordDrawInProgress = false, SwordDrawCompleted = false;
@@ -54,8 +56,10 @@ void UpdateTaishinMethod(double *ShoulderManipulateValue,
 void SwordDrawingProcedure();
 
 void setup() {
+  Serial.begin(115200);
   Sticks.ThisSends2Robot(LeftHalfAddress, kodaioh_shoulder::SendCB);
   Sticks.ThisReceives(kodaioh_shoulder::RecvCB);
+  Serial.println("started!");
 
   kodaioh_shoulder::setup(&Sticks, &BothHandsData, &BothHandsData.RightStick);
 
