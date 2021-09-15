@@ -6,6 +6,8 @@
 #include "AMT102V.h"
 #include "ControlStick.h"
 
+#define Debug
+
 namespace kodaioh_shoulder {
 
 Pinmap_t Pinmap;
@@ -30,24 +32,24 @@ void ShoulderRoriconInterrupter() { ShoulderRoricon->update(); }
 void UpperArmRoriconInterrupter() { UpperArmRoricon->update(); }
 
 void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status) {
-#ifdef Debug
-  Serial.print("\r\nLast Packet Send Status:\t");
-  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success"
-                                                : "Delivery Fail");
-#endif
+  // #ifdef Debug
+  //   Serial.print("\r\nLast Packet Send Status:\t");
+  //   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success"
+  //                                                 : "Delivery Fail");
+  // #endif
 }
 
 void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
   memcpy(&BothHandsData, incomingData, sizeof(BothHandsData));
   IsDirty = true;
-#ifdef Debug
-  Serial.println("Data Received!");
-  Serial.println("Right Hand\tRight Hand\tRight Hand\t");
-  stickDumpData(BothHandsData.RightStick);
-  Serial.println("Left Hand\tLeft Hand\tLeft Hand\t");
-  stickDumpData(BothHandsData.LeftStick);
-  Serial.println("\n");
-#endif
+  // #ifdef Debug
+  //   Serial.println("Data Received!");
+  //   Serial.println("Right Hand\tRight Hand\tRight Hand\t");
+  //   stickDumpData(BothHandsData.RightStick);
+  //   Serial.println("Left Hand\tLeft Hand\tLeft Hand\t");
+  //   stickDumpData(BothHandsData.LeftStick);
+  //   Serial.println("\n");
+  // #endif
 }
 
 void setup(controlstick::ControlStick *stick,
@@ -91,7 +93,9 @@ void update() {
     SensorStates.ShoulderLimits = digitalRead(Pinmap.ShoulderLimits);
     SensorStates.UpperArmLimits[i] = digitalRead(Pinmap.UpperArmLimits[i]);
   }
-
+#ifdef Debug
+  SensorStates.ShoulderLimits = true;
+#endif
   if (SensorStates.ShoulderLimits) {
     ShoulderRoriconInitialised = true;
     ShoulderRoricon->resetRotation();
