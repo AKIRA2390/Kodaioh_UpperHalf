@@ -78,6 +78,7 @@ void setup() {
 }
 
 void loop() {
+  Serial.println("update");
   if (SensorStates.ElbowLimits[1]) {
     ElbowRoriconInitialised = true;
     ElbowRoricon->resetRotation();
@@ -89,10 +90,11 @@ void loop() {
 
   kodaioh_shoulder::update();
 
-  Sticks.SendData2Robot(BothHandsData);
+  // Sticks.SendData2Robot(BothHandsData);
 
   RightArmUpdate();
   if (kodaioh_shoulder::IsDirty) {
+    Serial.println("data received");
     kodaioh_shoulder::UpdateWhenDirty();
     LeftArmUpdate();
     kodaioh_shoulder::IsDirty = false;
@@ -107,7 +109,7 @@ void RightArmUpdate() {
       SwordDrawInProgress)
     SwordDrawingProcedure();
 
-  UpdateTestDummy(&UpperArmManipulateValue, &UpperArmManipulateValue,
+  UpdateTestDummy(&ShoulderManipulateValue, &UpperArmManipulateValue,
                   &ElbowManipulateValue);
 
   if (ElbowManipulateValue > 0) {
@@ -117,6 +119,47 @@ void RightArmUpdate() {
     if (!SensorStates.ElbowLimits[1])
       analogWrite(Pinmap.ElbowMotors[1], -ElbowManipulateValue);
   }
+  Serial.print("Shoulder Manipulate Value:\t");
+  Serial.println(ShoulderManipulateValue);
+  Serial.print("Shoulder Angle Deg:\t\t");
+  Serial.println(kodaioh_shoulder::SensorStates.ShoulderRotationRad*RAD_TO_DEG);
+  Serial.print("Shoulder Limit Angle Deg:\t");
+  Serial.print(kodaioh_shoulder::ShoulderLimitAngleRad[0]*RAD_TO_DEG);
+  Serial.print("\t");
+  Serial.println(kodaioh_shoulder::ShoulderLimitAngleRad[1]*RAD_TO_DEG);
+  Serial.print("Shoulder Error Value:\t\t");
+  Serial.print((kodaioh_shoulder::ShoulderLimitAngleRad[0] - kodaioh_shoulder::SensorStates.ShoulderRotationRad)*RAD_TO_DEG);
+  Serial.print("\t");
+  Serial.print(kodaioh_shoulder::MotorPower*((kodaioh_shoulder::ShoulderLimitAngleRad[0] - kodaioh_shoulder::SensorStates.ShoulderRotationRad)/kodaioh_shoulder::ShoulderLimitAngleRad[0]));
+  Serial.println("\n");
+
+  Serial.print("UpperArm Manipulate Value:\t");
+  Serial.println(UpperArmManipulateValue);
+  Serial.print("UpperArm Angle Deg:\t\t");
+  Serial.println(kodaioh_shoulder::SensorStates.UpperArmRotationRad*RAD_TO_DEG);
+  Serial.print("UpperArm Limit Angle Deg:\t");
+  Serial.print(kodaioh_shoulder::UpperArmLimitAngleRad[0]*RAD_TO_DEG);
+  Serial.print("\t");
+  Serial.println(kodaioh_shoulder::UpperArmLimitAngleRad[1]*RAD_TO_DEG);
+  Serial.print("UpperArm Error Value:\t\t");
+  Serial.print((kodaioh_shoulder::UpperArmLimitAngleRad[0] - kodaioh_shoulder::SensorStates.UpperArmRotationRad)*RAD_TO_DEG);
+  Serial.print("\t");
+  Serial.print(kodaioh_shoulder::MotorPower*((kodaioh_shoulder::UpperArmLimitAngleRad[0] - kodaioh_shoulder::SensorStates.UpperArmRotationRad)/kodaioh_shoulder::UpperArmLimitAngleRad[0]));
+  Serial.println("\n");
+
+  Serial.print("Elbow Manipulate Value:\t\t");
+  Serial.println(ElbowManipulateValue);
+  Serial.print("Elbow Angle Deg:\t\t");
+  Serial.println(kodaioh_shoulder::SensorStates.ElbowRotationRad*RAD_TO_DEG);
+  Serial.print("Elbow Limit Angle Deg:\t\t");
+  Serial.print(ElbowLimitAngleRad[0]*RAD_TO_DEG);
+  Serial.print("\t");
+  Serial.println(ElbowLimitAngleRad[1]*RAD_TO_DEG);
+  Serial.print("Elbow Error Value:\t\t");
+  Serial.print((ElbowLimitAngleRad[0] - SensorStates.ElbowRotationRad)*RAD_TO_DEG);
+  Serial.print("\t");
+  Serial.print(kodaioh_shoulder::MotorPower*((ElbowLimitAngleRad[0] - SensorStates.ElbowRotationRad)/ElbowLimitAngleRad[0]));
+  Serial.println("\n");
 }
 
 void LeftArmUpdate() { Sticks.SendData2Robot(BothHandsData); }
@@ -127,7 +170,7 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
   const bool ElbowTesting = false;
   static bool ElbowDirection = true;
 
-  kodaioh_shoulder::UpdateTestDummy(UpperArmManipulateValue,
+  kodaioh_shoulder::UpdateTestDummy(ShoulderManipulateValue,
                                     UpperArmManipulateValue);
 
   if (SensorStates.ElbowLimits[0]) {
@@ -153,7 +196,7 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
 
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue) {
-  kodaioh_shoulder::UpdateAKIRAMethod(UpperArmManipulateValue,
+  kodaioh_shoulder::UpdateAKIRAMethod(ShoulderManipulateValue,
                                       UpperArmManipulateValue);
 
   if (BothHandsData.RightStick.ButtonState[3]) {
@@ -166,7 +209,7 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
 }
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue) {
-  kodaioh_shoulder::UpdateTaishinMethod(UpperArmManipulateValue,
+  kodaioh_shoulder::UpdateTaishinMethod(ShoulderManipulateValue,
                                         UpperArmManipulateValue);
 }
 

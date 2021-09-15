@@ -9,7 +9,7 @@
 namespace kodaioh_shoulder {
 
 Pinmap_t Pinmap;
-ShoulderSensorStates SensorStates;
+ShoulderSensorStates SensorStates = {};
 
 controlstick::ControlStick *Stick;
 controlstick::BothHandsData_t *BothHandsData;
