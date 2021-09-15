@@ -6,7 +6,7 @@
 #include "AMT102V.h"
 #include "ControlStick.h"
 
-#define Debug
+// #define Debug
 
 namespace kodaioh_shoulder {
 
@@ -123,26 +123,26 @@ void update() {
   Serial.println("\n");
 #endif
 }
-void UpdateWhenDirty() {
+void UpdateWhenDirty(double *ShoulderManipulateValue,
+                     double *UpperArmManipulateValue) {
   if (IsDirty) {
-    double ShoulderManipulateValue, UpperArmManipulateValue;
-    UpdateAKIRAMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);
-    // UpdateTaishinMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);
+    // UpdateAKIRAMethod(UpperArmManipulateValue, UpperArmManipulateValue);
+    // UpdateTaishinMethod(UpperArmManipulateValue, UpperArmManipulateValue);
 
-    if (ShoulderManipulateValue > 0) {
+    if (*ShoulderManipulateValue > 0) {
       if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0])
-        analogWrite(Pinmap.ShoulderMotors[0], ShoulderManipulateValue);
+        analogWrite(Pinmap.ShoulderMotors[0], *ShoulderManipulateValue);
     } else {
       if (ShoulderLimitAngleRad[1] < SensorStates.ShoulderRotationRad)
-        analogWrite(Pinmap.ShoulderMotors[1], -ShoulderManipulateValue);
+        analogWrite(Pinmap.ShoulderMotors[1], -*ShoulderManipulateValue);
     }
 
-    if (UpperArmManipulateValue > 0) {
+    if (*UpperArmManipulateValue > 0) {
       if (!SensorStates.UpperArmLimit[0])
-        analogWrite(Pinmap.UpperArmMotors[0], UpperArmManipulateValue);
+        analogWrite(Pinmap.UpperArmMotors[0], *UpperArmManipulateValue);
     } else {
       if (!SensorStates.UpperArmLimit[1])
-        analogWrite(Pinmap.UpperArmMotors[1], -UpperArmManipulateValue);
+        analogWrite(Pinmap.UpperArmMotors[1], -*UpperArmManipulateValue);
     }
   }
 }

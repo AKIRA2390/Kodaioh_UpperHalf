@@ -6,7 +6,6 @@
 #include "KodaiohShoulder.h"
 
 #define Debug
-
 typedef struct RightHalfPinmap_t {
   // output pins //
   // plus, minus
@@ -31,6 +30,8 @@ controlstick::BothHandsData_t BothHandsData;
 // uint8_t LeftHalfAddress[] = {0xEC, 0x94, 0xCB, 0x6E, 0x29, 0x70};
 uint8_t LeftHalfAddress[] = {0x24, 0x0A, 0xC4, 0xF9, 0x40, 0xD0};
 
+double ShoulderManipulateValue=0, UpperArmManipulateValue=0;
+double ElbowManipulateValue=0;
 
 bool ElbowRoriconInitialised = false;
 bool SwordDrawInProgress = false, SwordDrawCompleted = false;
@@ -95,16 +96,14 @@ void loop() {
   RightArmUpdate();
   if (kodaioh_shoulder::IsDirty) {
     Serial.println("data received");
-    kodaioh_shoulder::UpdateWhenDirty();
+    kodaioh_shoulder::UpdateWhenDirty(&ShoulderManipulateValue,
+                                      &UpperArmManipulateValue );
     LeftArmUpdate();
     kodaioh_shoulder::IsDirty = false;
   }
 }
 
 void RightArmUpdate() {
-  double ShoulderManipulateValue, UpperArmManipulateValue;
-  double ElbowManipulateValue;
-
   if ((BothHandsData.RightStick.ButtonState[4] && !SwordDrawCompleted) ||
       SwordDrawInProgress)
     SwordDrawingProcedure();
@@ -119,6 +118,7 @@ void RightArmUpdate() {
     if (!SensorStates.ElbowLimits[1])
       analogWrite(Pinmap.ElbowMotors[1], -ElbowManipulateValue);
   }
+  
   Serial.print("Shoulder Manipulate Value:\t");
   Serial.println(ShoulderManipulateValue);
   Serial.print("Shoulder Angle Deg:\t\t");
