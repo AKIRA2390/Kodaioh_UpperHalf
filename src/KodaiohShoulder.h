@@ -15,13 +15,13 @@ typedef struct Pinmap_t {
   const int ShoulderRoricon[2] = {36, 39};
   const int UpperArmRoricon[2] = {34, 35};
   // max,min
-  // const int ShoulderLimits[2] = {23, 22};
-  const int ShoulderLimits = 23;
-  const int UpperArmLimits[2] = {12, 13};
+  // const int ShoulderLimit[2] = {23, 22};
+  const int ShoulderLimit = 23;
+  const int UpperArmLimit[2] = {12, 13};
 } Pinmap_t;
 
 typedef struct ShoulderSensorStates {
-  bool ShoulderLimits, UpperArmLimits[2];
+  bool ShoulderLimit, UpperArmLimit[2];
   double ShoulderRotationRad, UpperArmRotationRad, ElbowRotationRad;
 } ShoulderSensorStates;
 

@@ -61,7 +61,7 @@ void setup(controlstick::ControlStick *stick,
 
   Stick->ThisReceives(RecvCB);
   Stick->SetupConnection();
-  pinMode(Pinmap.ShoulderLimits, INPUT_PULLUP);
+  pinMode(Pinmap.ShoulderLimit, INPUT_PULLUP);
   for (int i = 0; i < 2; i++) {
     pinMode(Pinmap.ShoulderMotors[i], OUTPUT);
     pinMode(Pinmap.UpperArmMotors[i], OUTPUT);
@@ -69,7 +69,7 @@ void setup(controlstick::ControlStick *stick,
     pinMode(Pinmap.ShoulderRoricon[i], INPUT);
     pinMode(Pinmap.UpperArmRoricon[i], INPUT);
 
-    pinMode(Pinmap.UpperArmLimits[i], INPUT_PULLUP);
+    pinMode(Pinmap.UpperArmLimit[i], INPUT_PULLUP);
   }
   ShoulderRoricon =
       new AMT102V(Pinmap.ShoulderRoricon[0], Pinmap.ShoulderRoricon[1]);
@@ -90,17 +90,17 @@ void setup(controlstick::ControlStick *stick,
 
 void update() {
   for (int i = 0; i < 2; i++) {
-    SensorStates.ShoulderLimits = digitalRead(Pinmap.ShoulderLimits);
-    SensorStates.UpperArmLimits[i] = digitalRead(Pinmap.UpperArmLimits[i]);
+    SensorStates.ShoulderLimit = digitalRead(Pinmap.ShoulderLimit);
+    SensorStates.UpperArmLimit[i] = digitalRead(Pinmap.UpperArmLimit[i]);
   }
 #ifdef Debug
-  SensorStates.ShoulderLimits = true;
+  SensorStates.ShoulderLimit = true;
 #endif
-  if (SensorStates.ShoulderLimits) {
+  if (SensorStates.ShoulderLimit) {
     ShoulderRoriconInitialised = true;
     ShoulderRoricon->resetRotation();
   }
-  if (SensorStates.UpperArmLimits[1]) {
+  if (SensorStates.UpperArmLimit[1]) {
     UpperArmRoriconInitialised = true;
     UpperArmRoricon->resetRotation();
   }
@@ -138,10 +138,10 @@ void UpdateWhenDirty() {
     }
 
     if (UpperArmManipulateValue > 0) {
-      if (!SensorStates.UpperArmLimits[0])
+      if (!SensorStates.UpperArmLimit[0])
         analogWrite(Pinmap.UpperArmMotors[0], UpperArmManipulateValue);
     } else {
-      if (!SensorStates.UpperArmLimits[1])
+      if (!SensorStates.UpperArmLimit[1])
         analogWrite(Pinmap.UpperArmMotors[1], -UpperArmManipulateValue);
     }
   }
@@ -157,9 +157,9 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
   } else if (ShoulderLimitAngleRad[1] < SensorStates.ShoulderRotationRad) {
     ShoulderDirection = true;
   }
-  if (SensorStates.UpperArmLimits[0]) {
+  if (SensorStates.UpperArmLimit[0]) {
     UpperArmDirection = false;
-  } else if (SensorStates.UpperArmLimits[1]) {
+  } else if (SensorStates.UpperArmLimit[1]) {
     UpperArmDirection = true;
   }
 
