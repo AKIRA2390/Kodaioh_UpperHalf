@@ -22,7 +22,7 @@ typedef struct Pinmap_t {
 
 typedef struct ShoulderSensorStates {
   bool ShoulderLimit, UpperArmLimit[2];
-  double ShoulderRotationRad, UpperArmRotationRad, ElbowRotationRad;
+  double ShoulderRotationRad, UpperArmRotationRad;
 } ShoulderSensorStates;
 
 extern Pinmap_t Pinmap;
@@ -47,7 +47,7 @@ void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status);
 void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len);
 
 void UpdateWhenDirty(double ShoulderManipulateValue,
-                       double UpperArmManipulateValue);
+                     double UpperArmManipulateValue);
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue);
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
@@ -57,7 +57,8 @@ void UpdateTaishinMethod(double *ShoulderManipulateValue,
 
 void setup(controlstick::ControlStick *stick,
            controlstick::BothHandsData_t *both_hands_data,
-           controlstick::InputData_t *input_data);
+           controlstick::InputData_t *input_data, bool ShoulderRoriconInvert = false,
+           bool UpperArmRoriconInvert = false);
 void update();
 
 }  // namespace kodaioh_shoulder

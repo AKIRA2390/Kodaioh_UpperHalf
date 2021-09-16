@@ -18,8 +18,8 @@ controlstick::BothHandsData_t *BothHandsData;
 controlstick::InputData_t *InputData;
 
 const int MotorPower = 200;
-const double ShoulderReductionRatio = 2 / 9;
-const double UpperArmReductionRatio = 78 / 194;
+const double ShoulderReductionRatio = 2. / 9;
+const double UpperArmReductionRatio = 78. / 194;
 const double ShoulderLimitAngleRad[2] = {140 * DEG_TO_RAD, -80 * DEG_TO_RAD};
 const double UpperArmLimitAngleRad[2] = {90 * DEG_TO_RAD, 0 * DEG_TO_RAD};
 
@@ -28,8 +28,18 @@ bool ShoulderRoriconInitialised = false, UpperArmRoriconInitialised = false;
 
 AMT102V *ShoulderRoricon, *UpperArmRoricon;
 
-void ShoulderRoriconInterrupter() { ShoulderRoricon->update(); }
-void UpperArmRoriconInterrupter() { UpperArmRoricon->update(); }
+void ShoulderRoriconInterrupter() {
+  ShoulderRoricon->update();
+  Serial.println(
+      "Shoulder Roricon Interrupter!Shoulder Roricon Interrupter!Shoulder "
+      "Roricon Interrupter!Shoulder Roricon Interrupter!");
+}
+void UpperArmRoriconInterrupter() {
+  UpperArmRoricon->update();
+  // Serial.println(
+  //     "UpperArm Roricon Interrupter!UpperArm Roricon Interrupter!UpperArm "
+  //     "Roricon Interrupter!UpperArm Roricon Interrupter!");
+}
 
 void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status) {
   // #ifdef Debug
@@ -54,7 +64,8 @@ void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
 
 void setup(controlstick::ControlStick *stick,
            controlstick::BothHandsData_t *both_hands_data,
-           controlstick::InputData_t *input_data) {
+           controlstick::InputData_t *input_data, bool ShoulderRoriconInvert,
+           bool UpperArmRoriconInvert) {
   Stick = stick;
   InputData = input_data;
   BothHandsData = both_hands_data;
@@ -72,15 +83,17 @@ void setup(controlstick::ControlStick *stick,
     pinMode(Pinmap.UpperArmLimit[i], INPUT_PULLUP);
   }
   ShoulderRoricon =
-      new AMT102V(Pinmap.ShoulderRoricon[0], Pinmap.ShoulderRoricon[1]);
+      new AMT102V(Pinmap.ShoulderRoricon[0], Pinmap.ShoulderRoricon[1],
+                  ShoulderRoriconInvert);
   ShoulderRoricon->setup(0b0000);
-  attachInterrupt(Pinmap.ShoulderRoricon[0], ShoulderRoriconInterrupter,
-                  RISING);
-  attachInterrupt(Pinmap.ShoulderRoricon[1], ShoulderRoriconInterrupter,
+  attachInterrupt(digitalPinToInterrupt(Pinmap.ShoulderRoricon[0]),
+                  ShoulderRoriconInterrupter, RISING);
+  attachInterrupt(digitalPinToInterrupt(Pinmap.ShoulderRoricon[1]), ShoulderRoriconInterrupter,
                   RISING);
 
   UpperArmRoricon =
-      new AMT102V(Pinmap.UpperArmRoricon[0], Pinmap.UpperArmRoricon[1]);
+      new AMT102V(Pinmap.UpperArmRoricon[0], Pinmap.UpperArmRoricon[1],
+                  UpperArmRoriconInvert);
   UpperArmRoricon->setup(0b0000);
   attachInterrupt(Pinmap.UpperArmRoricon[0], UpperArmRoriconInterrupter,
                   RISING);
@@ -90,8 +103,8 @@ void setup(controlstick::ControlStick *stick,
 
 void update() {
   for (int i = 0; i < 2; i++) {
-    SensorStates.ShoulderLimit = digitalRead(Pinmap.ShoulderLimit);
-    SensorStates.UpperArmLimit[i] = digitalRead(Pinmap.UpperArmLimit[i]);
+    SensorStates.ShoulderLimit = !digitalRead(Pinmap.ShoulderLimit);
+    SensorStates.UpperArmLimit[i] = !digitalRead(Pinmap.UpperArmLimit[i]);
   }
 #ifdef Debug
   SensorStates.ShoulderLimit = true;
@@ -152,9 +165,11 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
   const bool ShoulderTesting = true, UpperArmTesting = false;
   static bool ShoulderDirection = true, UpperArmDirection = true;
 
-  if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0]) {
+  Serial.println("shoulder unit test dummy");
+
+  if (SensorStates.ShoulderRotationRad > ShoulderLimitAngleRad[0]) {
     ShoulderDirection = false;
-  } else if (ShoulderLimitAngleRad[1] < SensorStates.ShoulderRotationRad) {
+  } else if (ShoulderLimitAngleRad[1] > SensorStates.ShoulderRotationRad) {
     ShoulderDirection = true;
   }
   if (SensorStates.UpperArmLimit[0]) {
@@ -163,19 +178,36 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
     UpperArmDirection = true;
   }
 
+  Serial.println("//////////////////////////");
+  Serial.println("shoulder reduction ratio");
+  Serial.println(ShoulderReductionRatio);
+  Serial.println("shoulder roricon initialised");
+  Serial.println(ShoulderRoriconInitialised);
+  Serial.println("shoulder direction");
+  Serial.println(ShoulderDirection);
+  Serial.println("shoulder testing");
+  Serial.println(ShoulderTesting);
+
   if (ShoulderRoriconInitialised && ShoulderTesting) {
     if (ShoulderDirection) {
-      *ShoulderManipulateValue =
-          MotorPower *
-          ((ShoulderLimitAngleRad[0] - SensorStates.ShoulderRotationRad) /
-           ShoulderLimitAngleRad[0]);
+      // *ShoulderManipulateValue =
+      //     MotorPower *
+      //     ((ShoulderLimitAngleRad[0] - SensorStates.ShoulderRotationRad) /
+      //      ShoulderLimitAngleRad[0]);
+      *ShoulderManipulateValue = MotorPower;
     } else {
-      *ShoulderManipulateValue =
-          -MotorPower *
-          ((ShoulderLimitAngleRad[1] - SensorStates.ShoulderRotationRad) /
-           ShoulderLimitAngleRad[0]);
+      // *ShoulderManipulateValue =
+      //     -MotorPower *
+      //     ((ShoulderLimitAngleRad[1] - SensorStates.ShoulderRotationRad) /
+      //      ShoulderLimitAngleRad[0]);
+      *ShoulderManipulateValue = -MotorPower;
     }
   }
+
+  Serial.println("shoulder manipulation vlaue");
+  Serial.println(*ShoulderManipulateValue);
+  Serial.println("//////////////////////////\n");
+
   if (UpperArmRoriconInitialised && UpperArmTesting) {
     if (UpperArmDirection) {
       *UpperArmManipulateValue =
