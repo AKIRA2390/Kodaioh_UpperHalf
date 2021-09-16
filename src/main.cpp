@@ -96,8 +96,8 @@ void loop() {
   RightArmUpdate();
   if (kodaioh_shoulder::IsDirty) {
     Serial.println("data received");
-    kodaioh_shoulder::UpdateWhenDirty(&ShoulderManipulateValue,
-                                      &UpperArmManipulateValue );
+    kodaioh_shoulder::UpdateWhenDirty(ShoulderManipulateValue,
+                                      UpperArmManipulateValue );
     LeftArmUpdate();
     kodaioh_shoulder::IsDirty = false;
   }
