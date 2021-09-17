@@ -20,7 +20,7 @@ controlstick::InputData_t *InputData;
 const int MotorPower = 200;
 const double ShoulderReductionRatio = 2. / 9;
 const double UpperArmReductionRatio = 78. / 194;
-const double ShoulderLimitAngleRad[2] = {140 * DEG_TO_RAD, -80 * DEG_TO_RAD};
+const double ShoulderLimitAngleRad[2] = {5 * DEG_TO_RAD, -5 * DEG_TO_RAD};
 const double UpperArmLimitAngleRad[2] = {90 * DEG_TO_RAD, 0 * DEG_TO_RAD};
 
 bool IsDirty = false;
@@ -30,9 +30,7 @@ AMT102V *ShoulderRoricon, *UpperArmRoricon;
 
 void ShoulderRoriconInterrupter() {
   ShoulderRoricon->update();
-  Serial.println(
-      "Shoulder Roricon Interrupter!Shoulder Roricon Interrupter!Shoulder "
-      "Roricon Interrupter!Shoulder Roricon Interrupter!");
+  // Serial.println("Shoulder");
 }
 void UpperArmRoriconInterrupter() {
   UpperArmRoricon->update();
@@ -88,8 +86,8 @@ void setup(controlstick::ControlStick *stick,
   ShoulderRoricon->setup(0b0000);
   attachInterrupt(digitalPinToInterrupt(Pinmap.ShoulderRoricon[0]),
                   ShoulderRoriconInterrupter, RISING);
-  attachInterrupt(digitalPinToInterrupt(Pinmap.ShoulderRoricon[1]), ShoulderRoriconInterrupter,
-                  RISING);
+  attachInterrupt(digitalPinToInterrupt(Pinmap.ShoulderRoricon[1]),
+                  ShoulderRoriconInterrupter, RISING);
 
   UpperArmRoricon =
       new AMT102V(Pinmap.UpperArmRoricon[0], Pinmap.UpperArmRoricon[1],
@@ -145,7 +143,7 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
     if (ShoulderManipulateValue > 0) {
       if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0])
         analogWrite(Pinmap.ShoulderMotors[0], ShoulderManipulateValue);
-    } else {
+    } else if (ShoulderManipulateValue < 0){
       if (ShoulderLimitAngleRad[1] < SensorStates.ShoulderRotationRad)
         analogWrite(Pinmap.ShoulderMotors[1], -ShoulderManipulateValue);
     }
@@ -153,7 +151,7 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
     if (UpperArmManipulateValue > 0) {
       if (!SensorStates.UpperArmLimit[0])
         analogWrite(Pinmap.UpperArmMotors[0], UpperArmManipulateValue);
-    } else {
+    } else if (UpperArmManipulateValue < 0){
       if (!SensorStates.UpperArmLimit[1])
         analogWrite(Pinmap.UpperArmMotors[1], -UpperArmManipulateValue);
     }
