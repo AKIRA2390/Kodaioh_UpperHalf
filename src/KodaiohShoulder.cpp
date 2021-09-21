@@ -141,18 +141,24 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
     // UpdateTaishinMethod(UpperArmManipulateValue, UpperArmManipulateValue);
 
     if (ShoulderManipulateValue > 0) {
-      if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0])
+      if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0]) {
         analogWrite(Pinmap.ShoulderMotors[0], ShoulderManipulateValue);
-    } else if (ShoulderManipulateValue < 0){
-      if (ShoulderLimitAngleRad[1] < SensorStates.ShoulderRotationRad)
+        analogWrite(Pinmap.ShoulderMotors[1], 0);
+      }
+    } else if (ShoulderManipulateValue < 0) {
+      if (ShoulderLimitAngleRad[1] < SensorStates.ShoulderRotationRad) {
+        analogWrite(Pinmap.ShoulderMotors[0], 0);
         analogWrite(Pinmap.ShoulderMotors[1], -ShoulderManipulateValue);
+      }
     }
 
     if (UpperArmManipulateValue > 0) {
       if (!SensorStates.UpperArmLimit[0])
         analogWrite(Pinmap.UpperArmMotors[0], UpperArmManipulateValue);
-    } else if (UpperArmManipulateValue < 0){
+        analogWrite(Pinmap.UpperArmMotors[1], 0);
+    } else if (UpperArmManipulateValue < 0) {
       if (!SensorStates.UpperArmLimit[1])
+        analogWrite(Pinmap.UpperArmMotors[0], 0);
         analogWrite(Pinmap.UpperArmMotors[1], -UpperArmManipulateValue);
     }
   }
