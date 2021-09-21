@@ -17,7 +17,7 @@ typedef struct Pinmap_t {
   // max,min
   // const int ShoulderLimit[2] = {23, 22};
   const int ShoulderLimit = 23;
-  const int UpperArmLimit[2] = {12, 13};
+  const int UpperArmLimit[2] = {16, 4};
 } Pinmap_t;
 
 typedef struct ShoulderSensorStates {

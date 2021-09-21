@@ -18,9 +18,11 @@ controlstick::BothHandsData_t *BothHandsData;
 controlstick::InputData_t *InputData;
 
 const int MotorPower = 200;
+const int ShoulderMotorPower = 200;
+const int UpperArmMotorPower = 150;
 const double ShoulderReductionRatio = 2. / 9;
 const double UpperArmReductionRatio = 78. / 194;
-const double ShoulderLimitAngleRad[2] = {5 * DEG_TO_RAD, -5 * DEG_TO_RAD};
+const double ShoulderLimitAngleRad[2] = {15 * DEG_TO_RAD, -15 * DEG_TO_RAD};
 const double UpperArmLimitAngleRad[2] = {90 * DEG_TO_RAD, 0 * DEG_TO_RAD};
 
 bool IsDirty = false;
@@ -104,6 +106,12 @@ void update() {
     SensorStates.ShoulderLimit = !digitalRead(Pinmap.ShoulderLimit);
     SensorStates.UpperArmLimit[i] = !digitalRead(Pinmap.UpperArmLimit[i]);
   }
+
+  Serial.println("UpperArm Limit max");
+  Serial.println(digitalRead(Pinmap.UpperArmLimit[0]));
+  Serial.println("UpperArm Limit min");
+  Serial.println(digitalRead(Pinmap.UpperArmLimit[1]));
+
 #ifdef Debug
   SensorStates.ShoulderLimit = true;
 #endif
@@ -153,20 +161,22 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
     }
 
     if (UpperArmManipulateValue > 0) {
-      if (!SensorStates.UpperArmLimit[0])
+      if (!SensorStates.UpperArmLimit[0]) {
         analogWrite(Pinmap.UpperArmMotors[0], UpperArmManipulateValue);
         analogWrite(Pinmap.UpperArmMotors[1], 0);
+      }
     } else if (UpperArmManipulateValue < 0) {
-      if (!SensorStates.UpperArmLimit[1])
+      if (!SensorStates.UpperArmLimit[1]) {
         analogWrite(Pinmap.UpperArmMotors[0], 0);
         analogWrite(Pinmap.UpperArmMotors[1], -UpperArmManipulateValue);
+      }
     }
   }
 }
 
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue) {
-  const bool ShoulderTesting = false, UpperArmTesting = true;
+  const bool ShoulderTesting = true, UpperArmTesting = true;
   static bool ShoulderDirection = true, UpperArmDirection = true;
 
   Serial.println("shoulder unit test dummy");
@@ -187,6 +197,10 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
   Serial.println(UpperArmReductionRatio);
   Serial.println("UpperArm roricon initialised");
   Serial.println(UpperArmRoriconInitialised);
+  Serial.println("UpperArm Limit max");
+  Serial.println(SensorStates.UpperArmLimit[0]);
+  Serial.println("UpperArm Limit min");
+  Serial.println(SensorStates.UpperArmLimit[1]);
   Serial.println("UpperArm direction");
   Serial.println(UpperArmDirection);
   Serial.println("UpperArm testing");
@@ -194,17 +208,9 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
 
   if (ShoulderRoriconInitialised && ShoulderTesting) {
     if (ShoulderDirection) {
-      // *ShoulderManipulateValue =
-      //     MotorPower *
-      //     ((ShoulderLimitAngleRad[0] - SensorStates.ShoulderRotationRad) /
-      //      ShoulderLimitAngleRad[0]);
-      *ShoulderManipulateValue = MotorPower;
+      *ShoulderManipulateValue = ShoulderMotorPower;
     } else {
-      // *ShoulderManipulateValue =
-      //     -MotorPower *
-      //     ((ShoulderLimitAngleRad[1] - SensorStates.ShoulderRotationRad) /
-      //      ShoulderLimitAngleRad[0]);
-      *ShoulderManipulateValue = -MotorPower;
+      *ShoulderManipulateValue = -ShoulderMotorPower;
     }
   }
 
@@ -214,24 +220,23 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
 
   if (UpperArmRoriconInitialised && UpperArmTesting) {
     if (UpperArmDirection) {
-      *UpperArmManipulateValue =
-          MotorPower *
-          ((UpperArmLimitAngleRad[0] - SensorStates.UpperArmRotationRad) /
-           UpperArmLimitAngleRad[0]);
+      *UpperArmManipulateValue = UpperArmMotorPower;
     } else {
-      *UpperArmManipulateValue =
-          -MotorPower *
-          ((UpperArmLimitAngleRad[1] - SensorStates.UpperArmRotationRad) /
-           UpperArmLimitAngleRad[0]);
+      *UpperArmManipulateValue = -UpperArmMotorPower;
     }
   }
+
+  //    *UpperArmManipulateValue = UpperArmMotorPower *
+  //     ((UpperArmLimitAngleRad[0] - SensorStates.UpperArmRotationRad)
+  //     /
+  //      UpperArmLimitAngleRad[0]);
 }
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue) {
   *ShoulderManipulateValue =
-      InputData->StickStates[0] * InputData->Slider * MotorPower;
+      InputData->StickStates[0] * InputData->Slider * ShoulderMotorPower;
   *UpperArmManipulateValue =
-      InputData->StickStates[1] * InputData->Slider * MotorPower;
+      InputData->StickStates[1] * InputData->Slider * UpperArmMotorPower;
 }
 
 void UpdateTaishinMethod(double *ShoulderManipulateValue,

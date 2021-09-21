@@ -142,6 +142,8 @@ void RightArmUpdate() {
   // Serial.print(kodaioh_shoulder::MotorPower*((kodaioh_shoulder::ShoulderLimitAngleRad[0] - kodaioh_shoulder::SensorStates.ShoulderRotationRad)/kodaioh_shoulder::ShoulderLimitAngleRad[0]));
   // Serial.println("\n");
 
+  Serial.print("UpperArm Roricon Raw:\t\t");
+  Serial.println(kodaioh_shoulder::UpperArmRoricon->getRotationsDouble());
   Serial.print("UpperArm roricon initialized:\t");
   Serial.println(kodaioh_shoulder::UpperArmRoriconInitialised?"true":"false");
   Serial.print("UpperArm Manipulate Value:\t");
