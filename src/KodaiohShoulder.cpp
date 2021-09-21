@@ -166,7 +166,7 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
 
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue) {
-  const bool ShoulderTesting = true, UpperArmTesting = false;
+  const bool ShoulderTesting = false, UpperArmTesting = true;
   static bool ShoulderDirection = true, UpperArmDirection = true;
 
   Serial.println("shoulder unit test dummy");
@@ -183,14 +183,14 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
   }
 
   Serial.println("//////////////////////////");
-  Serial.println("shoulder reduction ratio");
-  Serial.println(ShoulderReductionRatio);
-  Serial.println("shoulder roricon initialised");
-  Serial.println(ShoulderRoriconInitialised);
-  Serial.println("shoulder direction");
-  Serial.println(ShoulderDirection);
-  Serial.println("shoulder testing");
-  Serial.println(ShoulderTesting);
+  Serial.println("UpperArm reduction ratio");
+  Serial.println(UpperArmReductionRatio);
+  Serial.println("UpperArm roricon initialised");
+  Serial.println(UpperArmRoriconInitialised);
+  Serial.println("UpperArm direction");
+  Serial.println(UpperArmDirection);
+  Serial.println("UpperArm testing");
+  Serial.println(UpperArmTesting);
 
   if (ShoulderRoriconInitialised && ShoulderTesting) {
     if (ShoulderDirection) {
@@ -208,8 +208,8 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
     }
   }
 
-  Serial.println("shoulder manipulation vlaue");
-  Serial.println(*ShoulderManipulateValue);
+  Serial.println("UpperArm manipulation vlaue");
+  Serial.println(*UpperArmManipulateValue);
   Serial.println("//////////////////////////\n");
 
   if (UpperArmRoriconInitialised && UpperArmTesting) {
