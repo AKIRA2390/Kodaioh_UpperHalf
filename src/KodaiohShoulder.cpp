@@ -21,7 +21,7 @@ const int MotorPower = 200;
 const int ShoulderMotorPower = 200;
 const int UpperArmMotorPower = 150;
 const double ShoulderReductionRatio = 2. / 9;
-const double UpperArmReductionRatio = 78. / 194;
+const double UpperArmReductionRatio = 97. / 39;
 const double ShoulderLimitAngleRad[2] = {15 * DEG_TO_RAD, -15 * DEG_TO_RAD};
 const double UpperArmLimitAngleRad[2] = {90 * DEG_TO_RAD, 0 * DEG_TO_RAD};
 
@@ -176,7 +176,7 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
 
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue) {
-  const bool ShoulderTesting = true, UpperArmTesting = true;
+  const bool ShoulderTesting = false, UpperArmTesting = true;
   static bool ShoulderDirection = true, UpperArmDirection = true;
 
   Serial.println("shoulder unit test dummy");
