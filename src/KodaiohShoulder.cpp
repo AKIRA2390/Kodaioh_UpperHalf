@@ -18,11 +18,11 @@ controlstick::BothHandsData_t *BothHandsData;
 controlstick::InputData_t *InputData;
 
 const int MotorPower = 200;
-const int ShoulderMotorPower = 200;
+const int ShoulderMotorPower = 150;
 const int UpperArmMotorPower = 150;
 const double ShoulderReductionRatio = 2. / 9;
 const double UpperArmReductionRatio = 97. / 39;
-const double ShoulderLimitAngleRad[2] = {15 * DEG_TO_RAD, -15 * DEG_TO_RAD};
+const double ShoulderLimitAngleRad[2] = {90 * DEG_TO_RAD, -60 * DEG_TO_RAD};
 const double UpperArmLimitAngleRad[2] = {90 * DEG_TO_RAD, 0 * DEG_TO_RAD};
 
 bool IsDirty = false;
@@ -176,8 +176,8 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
 
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue) {
-  const bool ShoulderTesting = false, UpperArmTesting = true;
-  static bool ShoulderDirection = true, UpperArmDirection = true;
+  const bool ShoulderTesting = true, UpperArmTesting = true;
+  static bool ShoulderDirection = false, UpperArmDirection = true;
 
   Serial.println("shoulder unit test dummy");
 
