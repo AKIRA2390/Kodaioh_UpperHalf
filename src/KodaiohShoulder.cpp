@@ -32,13 +32,9 @@ AMT102V *ShoulderRoricon, *UpperArmRoricon;
 
 void ShoulderRoriconInterrupter() {
   ShoulderRoricon->update();
-  // Serial.println("Shoulder");
 }
 void UpperArmRoriconInterrupter() {
   UpperArmRoricon->update();
-  // Serial.println(
-  //     "UpperArm Roricon Interrupter!UpperArm Roricon Interrupter!UpperArm "
-  //     "Roricon Interrupter!UpperArm Roricon Interrupter!");
 }
 
 void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status) {
@@ -107,11 +103,6 @@ void update() {
     SensorStates.UpperArmLimit[i] = !digitalRead(Pinmap.UpperArmLimit[i]);
   }
 
-  Serial.println("UpperArm Limit max");
-  Serial.println(digitalRead(Pinmap.UpperArmLimit[0]));
-  Serial.println("UpperArm Limit min");
-  Serial.println(digitalRead(Pinmap.UpperArmLimit[1]));
-
 #ifdef Debug
   SensorStates.ShoulderLimit = true;
 #endif
@@ -133,13 +124,6 @@ void update() {
         (UpperArmRoricon->getRotationsDouble() / UpperArmReductionRatio) * 2 *
         PI;
 #ifdef Debug
-  Serial.print("Shoulder Rotation:");
-  Serial.println(SensorStates.ShoulderRotationRad * RAD_TO_DEG);
-  Serial.print("UpperArm Rotation:");
-  Serial.println(SensorStates.UpperArmRotationRad * RAD_TO_DEG);
-  Serial.print("Elbow Rotation:");
-  Serial.println(SensorStates.ElbowRotationRad * RAD_TO_DEG);
-  Serial.println("\n");
 #endif
 }
 void UpdateWhenDirty(double ShoulderManipulateValue,
@@ -192,20 +176,6 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
     UpperArmDirection = true;
   }
 
-  Serial.println("//////////////////////////");
-  Serial.println("UpperArm reduction ratio");
-  Serial.println(UpperArmReductionRatio);
-  Serial.println("UpperArm roricon initialised");
-  Serial.println(UpperArmRoriconInitialised);
-  Serial.println("UpperArm Limit max");
-  Serial.println(SensorStates.UpperArmLimit[0]);
-  Serial.println("UpperArm Limit min");
-  Serial.println(SensorStates.UpperArmLimit[1]);
-  Serial.println("UpperArm direction");
-  Serial.println(UpperArmDirection);
-  Serial.println("UpperArm testing");
-  Serial.println(UpperArmTesting);
-
   if (ShoulderRoriconInitialised && ShoulderTesting) {
     if (ShoulderDirection) {
       *ShoulderManipulateValue = ShoulderMotorPower;
@@ -213,10 +183,6 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
       *ShoulderManipulateValue = -ShoulderMotorPower;
     }
   }
-
-  Serial.println("UpperArm manipulation vlaue");
-  Serial.println(*UpperArmManipulateValue);
-  Serial.println("//////////////////////////\n");
 
   if (UpperArmRoriconInitialised && UpperArmTesting) {
     if (UpperArmDirection) {
