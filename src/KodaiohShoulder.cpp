@@ -46,10 +46,10 @@ void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status) {
 }
 
 void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
-  memcpy(&BothHandsData, incomingData, sizeof(BothHandsData));
+  memcpy(&BothHandsData, incomingData, sizeof(incomingData));
   IsDirty = true;
   // #ifdef Debug
-  //   Serial.println("Data Received!");
+    Serial.println("Data Received!");
   //   Serial.println("Right Hand\tRight Hand\tRight Hand\t");
   //   stickDumpData(BothHandsData.RightStick);
   //   Serial.println("Left Hand\tLeft Hand\tLeft Hand\t");
@@ -160,7 +160,7 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
 
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue) {
-  const bool ShoulderTesting = true, UpperArmTesting = true;
+  const bool ShoulderTesting = false, UpperArmTesting = false;
   static bool ShoulderDirection = false, UpperArmDirection = true;
 
   Serial.println("shoulder unit test dummy");

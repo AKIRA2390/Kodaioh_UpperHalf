@@ -108,6 +108,11 @@ void loop() {
                                       UpperArmManipulateValue);
     LeftArmUpdate();
     kodaioh_shoulder::IsDirty = false;
+
+    Serial.println("Right Hands Received Data:");
+    Sticks.DumpData(BothHandsData.RightStick);
+    Serial.println("Left Hands Received Data:");
+    Sticks.DumpData(BothHandsData.LeftStick);
   }
 }
 
@@ -173,18 +178,18 @@ void RightArmUpdate() {
   // kodaioh_shoulder::SensorStates.UpperArmRotationRad)/kodaioh_shoulder::UpperArmLimitAngleRad[0]));
   // Serial.println("\n");
 
-  Serial.print("Elbow Roricon Initialized:\t");
-  Serial.println(ElbowRoriconInitialised ? "true" : "false");
-  Serial.print("Elbow Roricon Raw:\t\t");
-  Serial.println(ElbowRoricon->getRotationsDouble());
-  Serial.print("Elbow Manipulate Value:\t\t");
-  Serial.println(ElbowManipulateValue);
-  Serial.print("Elbow Angle Deg:\t\t");
-  Serial.println(SensorStates.ElbowRotationRad * RAD_TO_DEG);
-  Serial.print("Elbow Limit max\t\t");
-  Serial.println(SensorStates.ElbowLimit[0]);
-  Serial.print("Elbow Limit min\t\t");
-  Serial.println(SensorStates.ElbowLimit[1]);
+  // Serial.print("Elbow Roricon Initialized:\t");
+  // Serial.println(ElbowRoriconInitialised ? "true" : "false");
+  // Serial.print("Elbow Roricon Raw:\t\t");
+  // Serial.println(ElbowRoricon->getRotationsDouble());
+  // Serial.print("Elbow Manipulate Value:\t\t");
+  // Serial.println(ElbowManipulateValue);
+  // Serial.print("Elbow Angle Deg:\t\t");
+  // Serial.println(SensorStates.ElbowRotationRad * RAD_TO_DEG);
+  // Serial.print("Elbow Limit max\t\t");
+  // Serial.println(SensorStates.ElbowLimit[0]);
+  // Serial.print("Elbow Limit min\t\t");
+  // Serial.println(SensorStates.ElbowLimit[1]);
   // Serial.print("Elbow Limit Angle Deg:\t\t");
   // Serial.print(ElbowLimitAngleRad[0]*RAD_TO_DEG);
   // Serial.print("\t");
@@ -194,7 +199,7 @@ void RightArmUpdate() {
   // SensorStates.ElbowRotationRad)*RAD_TO_DEG); Serial.print("\t");
   // Serial.print(kodaioh_shoulder::MotorPower*((ElbowLimitAngleRad[0] -
   // SensorStates.ElbowRotationRad)/ElbowLimitAngleRad[0]));
-  Serial.println("\n");
+  // Serial.println("\n");
 }
 
 void LeftArmUpdate() {
@@ -204,7 +209,7 @@ void LeftArmUpdate() {
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue,
                      double *ElbowManipulateValue) {
-  const bool ElbowTesting = true;
+  const bool ElbowTesting = false;
   static bool ElbowDirection = true;
 
   kodaioh_shoulder::IsDirty = true;
