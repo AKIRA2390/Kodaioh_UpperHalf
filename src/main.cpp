@@ -60,11 +60,10 @@ void SwordDrawingProcedure();
 
 void setup() {
   Serial.begin(115200);
-  // Sticks.ThisSends2Robot(LeftHalfAddress, kodaioh_shoulder::SendCB);
-  Sticks.ThisReceives(kodaioh_shoulder::RecvCB);
+  // Sticks.ThisSends2Robot(LeftHalfAddress, );
   Serial.println("started!");
 
-  kodaioh_shoulder::setup(&Sticks, &BothHandsData, &BothHandsData.RightStick,
+  kodaioh_shoulder::setup(&Sticks, &BothHandsData, &(BothHandsData.RightStick),
                           true);
 
   for (int i = 0; i < 2; i++) {
@@ -101,11 +100,11 @@ void loop() {
 
   // Sticks.SendData2Robot(BothHandsData);
 
-  RightArmUpdate();
   if (kodaioh_shoulder::IsDirty) {
     Serial.println("is dirty");
     kodaioh_shoulder::UpdateWhenDirty(ShoulderManipulateValue,
                                       UpperArmManipulateValue);
+  RightArmUpdate();
     LeftArmUpdate();
     kodaioh_shoulder::IsDirty = false;
 
@@ -114,6 +113,7 @@ void loop() {
     Serial.println("Left Hands Received Data:");
     Sticks.DumpData(BothHandsData.LeftStick);
   }
+  delay(100);
 }
 
 void RightArmUpdate() {
@@ -121,8 +121,9 @@ void RightArmUpdate() {
       SwordDrawInProgress)
     SwordDrawingProcedure();
   Serial.println("right arm update");
-  UpdateTestDummy(&ShoulderManipulateValue, &UpperArmManipulateValue,
-                  &ElbowManipulateValue);
+  // UpdateTestDummy(&ShoulderManipulateValue, &UpperArmManipulateValue,
+  //                 &ElbowManipulateValue);
+  UpdateAKIRAMethod(&ShoulderManipulateValue, &UpperArmManipulateValue);
 
   if (ElbowManipulateValue > 0) {
     if (!SensorStates.ElbowLimit[0]) {
