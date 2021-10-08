@@ -29,7 +29,7 @@ extern Pinmap_t Pinmap;
 extern ShoulderSensorStates SensorStates;
 
 extern controlstick::ControlStick *Stick;
-extern controlstick::BothHandsData_t *BothHandsData;
+extern controlstick::BothHandsData_t BothHandsData;
 extern controlstick::InputData_t *InputData;
 
 extern AMT102V *ShoulderRoricon, *UpperArmRoricon;
@@ -46,6 +46,12 @@ extern bool ShoulderRoriconInitialised, UpperArmRoriconInitialised;
 void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status);
 void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len);
 
+void setup(controlstick::ControlStick *stick,
+           controlstick::InputData_t *input_data,
+           bool ShoulderRoriconInvert = false,
+           bool UpperArmRoriconInvert = false);
+void update();
+
 void UpdateWhenDirty(double ShoulderManipulateValue,
                      double UpperArmManipulateValue);
 void UpdateTestDummy(double *ShoulderManipulateValue,
@@ -55,10 +61,5 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue);
 
-void setup(controlstick::ControlStick *stick,
-           controlstick::BothHandsData_t *both_hands_data,
-           controlstick::InputData_t *input_data, bool ShoulderRoriconInvert = false,
-           bool UpperArmRoriconInvert = false);
-void update();
-
+void GetBothHandsData(controlstick::BothHandsData_t *Value);
 }  // namespace kodaioh_shoulder

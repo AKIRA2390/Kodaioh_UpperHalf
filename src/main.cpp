@@ -25,7 +25,7 @@ typedef struct RightHalfSensorStates {
 RightHalfPinmap_t Pinmap;
 RightHalfSensorStates SensorStates;
 
-controlstick::ControlStick Sticks;
+controlstick::ControlStick Sticks = {};
 controlstick::BothHandsData_t BothHandsData;
 // uint8_t LeftHalfAddress[] = {0xEC, 0x94, 0xCB, 0x6E, 0x29, 0x70};
 uint8_t LeftHalfAddress[] = {0x24, 0x0A, 0xC4, 0xF9, 0x40, 0xD0};
@@ -63,8 +63,7 @@ void setup() {
   // Sticks.ThisSends2Robot(LeftHalfAddress, );
   Serial.println("started!");
 
-  kodaioh_shoulder::setup(&Sticks, &BothHandsData, &(BothHandsData.RightStick),
-                          true,true);
+  kodaioh_shoulder::setup(&Sticks, &(BothHandsData.RightStick), true, true);
 
   for (int i = 0; i < 2; i++) {
     pinMode(Pinmap.ElbowMotors[i], OUTPUT);
@@ -103,6 +102,7 @@ void loop() {
   RightArmUpdate();
   if (kodaioh_shoulder::IsDirty) {
     Serial.println("is dirty");
+    kodaioh_shoulder::GetBothHandsData(&BothHandsData);
     kodaioh_shoulder::UpdateWhenDirty(ShoulderManipulateValue,
                                       UpperArmManipulateValue);
     LeftArmUpdate();
@@ -175,7 +175,7 @@ void RightArmUpdate() {
   // Serial.print(kodaioh_shoulder::UpperArmLimitAngleRad[0]*RAD_TO_DEG);
   // Serial.print("\t");
   // Serial.println(kodaioh_shoulder::UpperArmLimitAngleRad[1]*RAD_TO_DEG);
-  
+
   // Serial.print("UpperArm Limit Stats:\t");
   // Serial.print(kodaioh_shoulder::SensorStates.UpperArmLimit[0]);
   // Serial.print("\t");

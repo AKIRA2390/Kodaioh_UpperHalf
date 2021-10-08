@@ -14,7 +14,9 @@ Pinmap_t Pinmap;
 ShoulderSensorStates SensorStates = {};
 
 controlstick::ControlStick *Stick;
-controlstick::BothHandsData_t *BothHandsData;
+controlstick::BothHandsData_t BothHandsData;
+controlstick::BothHandsData_t
+    BothHandsDataWhichOnlyExistsForTheSizeCalclationLol;
 controlstick::InputData_t *InputData;
 
 const int MotorPower = 200;
@@ -42,28 +44,29 @@ void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status) {
 }
 
 void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
-  memcpy(&BothHandsData, incomingData, sizeof(incomingData));
+  memcpy(&BothHandsData, incomingData, sizeof(BothHandsData));
+  // BothHandsData = ((controlstick::BothHandsData_t *)incomingData);
+
   IsDirty = true;
   // #ifdef Debug
   Serial.println("Data Received!");
-  //   Serial.println("Right Hand\tRight Hand\tRight Hand\t");
-  //   stickDumpData(BothHandsData.RightStick);
-  //   Serial.println("Left Hand\tLeft Hand\tLeft Hand\t");
-  //   stickDumpData(BothHandsData.LeftStick);
-  //   Serial.println("\n");
+  Serial.println("Right Hand\tRight Hand\tRight Hand\t");
+  Stick->DumpData(((controlstick::BothHandsData_t *)incomingData)->RightStick);
+  Serial.println("Left Hand\tLeft Hand\tLeft Hand\t");
+  Stick->DumpData(((controlstick::BothHandsData_t *)incomingData)->LeftStick);
+  Serial.println("\n");
   // #endif
 }
 
 void setup(controlstick::ControlStick *stick,
-           controlstick::BothHandsData_t *both_hands_data,
            controlstick::InputData_t *input_data, bool ShoulderRoriconInvert,
            bool UpperArmRoriconInvert) {
   Stick = stick;
   InputData = input_data;
-  BothHandsData = both_hands_data;
 
   Stick->ThisReceives(RecvCB);
   Stick->SetupConnection();
+
   pinMode(Pinmap.ShoulderLimit, INPUT_PULLUP);
   for (int i = 0; i < 2; i++) {
     pinMode(Pinmap.ShoulderMotors[i], OUTPUT);
@@ -74,10 +77,12 @@ void setup(controlstick::ControlStick *stick,
 
     pinMode(Pinmap.UpperArmLimit[i], INPUT_PULLUP);
   }
+
   ShoulderRoricon =
       new AMT102V(Pinmap.ShoulderRoricon[0], Pinmap.ShoulderRoricon[1],
                   ShoulderRoriconInvert);
   ShoulderRoricon->setup(0b0000);
+
   attachInterrupt(digitalPinToInterrupt(Pinmap.ShoulderRoricon[0]),
                   ShoulderRoriconInterrupter, RISING);
   attachInterrupt(digitalPinToInterrupt(Pinmap.ShoulderRoricon[1]),
@@ -87,6 +92,7 @@ void setup(controlstick::ControlStick *stick,
       new AMT102V(Pinmap.UpperArmRoricon[0], Pinmap.UpperArmRoricon[1],
                   UpperArmRoriconInvert);
   UpperArmRoricon->setup(0b0000);
+
   attachInterrupt(Pinmap.UpperArmRoricon[0], UpperArmRoriconInterrupter,
                   RISING);
   attachInterrupt(Pinmap.UpperArmRoricon[1], UpperArmRoriconInterrupter,
@@ -122,6 +128,7 @@ void update() {
 #ifdef Debug
 #endif
 }
+
 void UpdateWhenDirty(double ShoulderManipulateValue,
                      double UpperArmManipulateValue) {
   if (!IsDirty) return;
@@ -198,6 +205,7 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
   //     /
   //      UpperArmLimitAngleRad[0]);
 }
+
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue) {
   *ShoulderManipulateValue =
@@ -208,4 +216,8 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
 
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue) {}
+
+void GetBothHandsData(controlstick::BothHandsData_t *Value) {
+  memcpy(Value, &BothHandsData, sizeof(BothHandsData));
+}
 }  // namespace kodaioh_shoulder
