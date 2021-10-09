@@ -140,11 +140,17 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
     if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0]) {
       analogWrite(Pinmap.ShoulderMotors[0], ShoulderManipulateValue);
       analogWrite(Pinmap.ShoulderMotors[1], 0);
+    }else{
+      analogWrite(Pinmap.ShoulderMotors[0], 0);
+      analogWrite(Pinmap.ShoulderMotors[1], 0);
     }
   } else if (ShoulderManipulateValue < 0) {
     if (ShoulderLimitAngleRad[1] < SensorStates.ShoulderRotationRad) {
       analogWrite(Pinmap.ShoulderMotors[0], 0);
       analogWrite(Pinmap.ShoulderMotors[1], -ShoulderManipulateValue);
+    }else{
+      analogWrite(Pinmap.ShoulderMotors[0], 0);
+      analogWrite(Pinmap.ShoulderMotors[1], 0);
     }
   }
 
@@ -152,11 +158,17 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
     if (!SensorStates.UpperArmLimit[0]) {
       analogWrite(Pinmap.UpperArmMotors[0], UpperArmManipulateValue);
       analogWrite(Pinmap.UpperArmMotors[1], 0);
+    }else{
+      analogWrite(Pinmap.UpperArmMotors[0], 0);
+      analogWrite(Pinmap.UpperArmMotors[1], 0);
     }
   } else if (UpperArmManipulateValue < 0) {
     if (!SensorStates.UpperArmLimit[1]) {
       analogWrite(Pinmap.UpperArmMotors[0], 0);
       analogWrite(Pinmap.UpperArmMotors[1], -UpperArmManipulateValue);
+    }else{
+      analogWrite(Pinmap.UpperArmMotors[0], 0);
+      analogWrite(Pinmap.UpperArmMotors[1], 0);
     }
   }
 }
@@ -209,9 +221,9 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue) {
   *ShoulderManipulateValue =
-      InputData->StickStates[0] * InputData->Slider * ShoulderMotorPower;
+      InputData->StickStates[1] * InputData->Slider * ShoulderMotorPower;
   *UpperArmManipulateValue =
-      InputData->StickStates[1] * InputData->Slider * UpperArmMotorPower;
+      InputData->StickStates[0] * InputData->Slider * UpperArmMotorPower;
 }
 
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
