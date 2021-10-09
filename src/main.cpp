@@ -279,11 +279,15 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                                       UpperArmManipulateValue);
 
   if (BothHandsData.RightStick.ButtonState[3]) {
-    if (SensorStates.ElbowLimit[0])
+    if (SensorStates.ElbowLimit[0]) {
       analogWrite(Pinmap.ElbowMotors[0], kodaioh_shoulder::MotorPower);
+      analogWrite(Pinmap.ElbowMotors[1], 0);
+    }
   } else if (BothHandsData.RightStick.ButtonState[2]) {
-    if (SensorStates.ElbowLimit[1])
-      analogWrite(Pinmap.ElbowMotors[1], -kodaioh_shoulder::MotorPower);
+    if (SensorStates.ElbowLimit[1]) {
+      analogWrite(Pinmap.ElbowMotors[0], 0);
+      analogWrite(Pinmap.ElbowMotors[1], kodaioh_shoulder::MotorPower);
+    }
   }
 }
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
