@@ -55,8 +55,13 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue);
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue);
+void Update4RightArmReset(double *ShoulderManipulateValue,
+                          double *UpperArmManipulateValue,
+                          double *ElbowManipulateValue);
 
-void SwordDrawingProcedure();
+void SwordDrawingProcedure(double *ShoulderManipulateValue,
+                           double *UpperArmManipulateValue,
+                           double *ElbowManipulateValue);
 
 void setup() {
   Serial.begin(115200);
@@ -121,7 +126,9 @@ void loop() {
 void RightArmUpdate() {
   if ((BothHandsData.RightStick.ButtonState[4] && !SwordDrawCompleted) ||
       SwordDrawInProgress)
-    SwordDrawingProcedure();
+    SwordDrawingProcedure(&ShoulderManipulateValue, &UpperArmManipulateValue,
+                          &ElbowManipulateValue);
+
   Serial.println("right arm update");
   // UpdateTestDummy(&ShoulderManipulateValue, &UpperArmManipulateValue,
   //                 &ElbowManipulateValue);
@@ -131,7 +138,7 @@ void RightArmUpdate() {
     if (!SensorStates.ElbowLimit[0]) {
       analogWrite(Pinmap.ElbowMotors[0], ElbowManipulateValue);
       analogWrite(Pinmap.ElbowMotors[1], 0);
-    }else{
+    } else {
       analogWrite(Pinmap.ElbowMotors[0], 0);
       analogWrite(Pinmap.ElbowMotors[1], 0);
     }
@@ -139,7 +146,7 @@ void RightArmUpdate() {
     if (!SensorStates.ElbowLimit[1]) {
       analogWrite(Pinmap.ElbowMotors[0], 0);
       analogWrite(Pinmap.ElbowMotors[1], ElbowManipulateValue);
-    }else{
+    } else {
       analogWrite(Pinmap.ElbowMotors[0], 0);
       analogWrite(Pinmap.ElbowMotors[1], 0);
     }
@@ -284,7 +291,20 @@ void UpdateTaishinMethod(double *ShoulderManipulateValue,
   kodaioh_shoulder::UpdateTaishinMethod(ShoulderManipulateValue,
                                         UpperArmManipulateValue);
 }
+void Update4RightArmReset(double *ShoulderManipulateValue,
+                          double *UpperArmManipulateValue,
+                          double *ElbowManipulateValue) {
+  kodaioh_shoulder::Update4ShoulderUnitReset(ShoulderManipulateValue,
+                                             UpperArmManipulateValue);
+  if (ElbowRoriconInitialised) {
+    *ElbowManipulateValue = -ElbowMotorPower;
+  }
+}
 
-void SwordDrawingProcedure() {
+void SwordDrawingProcedure(double *ShoulderManipulateValue,
+                           double *UpperArmManipulateValue,
+                           double *ElbowManipulateValue) {
   ///このモーターをこのくらい動かし、そのモーターをあのくらい動かし、
+  Update4RightArmReset(ShoulderManipulateValue, UpperArmManipulateValue,
+                       ElbowManipulateValue);
 }

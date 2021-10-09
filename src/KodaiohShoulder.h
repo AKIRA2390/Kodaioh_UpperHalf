@@ -61,5 +61,8 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue);
 
+void Update4ShoulderUnitReset(double *ShoulderManipulateValue,
+                         double *UpperArmManipulateValue);
+
 void GetBothHandsData(controlstick::BothHandsData_t *Value);
 }  // namespace kodaioh_shoulder

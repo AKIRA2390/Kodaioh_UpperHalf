@@ -140,7 +140,7 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
     if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0]) {
       analogWrite(Pinmap.ShoulderMotors[0], ShoulderManipulateValue);
       analogWrite(Pinmap.ShoulderMotors[1], 0);
-    }else{
+    } else {
       analogWrite(Pinmap.ShoulderMotors[0], 0);
       analogWrite(Pinmap.ShoulderMotors[1], 0);
     }
@@ -148,7 +148,7 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
     if (ShoulderLimitAngleRad[1] < SensorStates.ShoulderRotationRad) {
       analogWrite(Pinmap.ShoulderMotors[0], 0);
       analogWrite(Pinmap.ShoulderMotors[1], -ShoulderManipulateValue);
-    }else{
+    } else {
       analogWrite(Pinmap.ShoulderMotors[0], 0);
       analogWrite(Pinmap.ShoulderMotors[1], 0);
     }
@@ -158,7 +158,7 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
     if (!SensorStates.UpperArmLimit[0]) {
       analogWrite(Pinmap.UpperArmMotors[0], UpperArmManipulateValue);
       analogWrite(Pinmap.UpperArmMotors[1], 0);
-    }else{
+    } else {
       analogWrite(Pinmap.UpperArmMotors[0], 0);
       analogWrite(Pinmap.UpperArmMotors[1], 0);
     }
@@ -166,7 +166,7 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
     if (!SensorStates.UpperArmLimit[1]) {
       analogWrite(Pinmap.UpperArmMotors[0], 0);
       analogWrite(Pinmap.UpperArmMotors[1], -UpperArmManipulateValue);
-    }else{
+    } else {
       analogWrite(Pinmap.UpperArmMotors[0], 0);
       analogWrite(Pinmap.UpperArmMotors[1], 0);
     }
@@ -228,6 +228,28 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
 
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue) {}
+
+void Update4ShoulderUnitReset(double *ShoulderManipulateValue,
+                              double *UpperArmManipulateValue) {
+  static bool ShoulderDirection = true;
+
+  if (SensorStates.ShoulderRotationRad > 0) {
+    ShoulderDirection = false;
+  } else if (0 > SensorStates.ShoulderRotationRad) {
+    ShoulderDirection = true;
+  }
+
+  if (ShoulderRoriconInitialised) {
+    if (ShoulderDirection) {
+      *ShoulderManipulateValue = ShoulderMotorPower;
+    } else {
+      *ShoulderManipulateValue = -ShoulderMotorPower;
+    }
+  }
+
+  *UpperArmManipulateValue = -UpperArmMotorPower;
+}
+
 
 void GetBothHandsData(controlstick::BothHandsData_t *Value) {
   memcpy(Value, &BothHandsData, sizeof(BothHandsData));
