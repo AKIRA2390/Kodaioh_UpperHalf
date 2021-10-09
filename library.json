@@ -1,6 +1,6 @@
 {
     "name": "KodaiohShoulder",
-    "version": "4.0.0",
+    "version": "4.0.1",
     "description": "codes to use Kohdaioh Shoulder",
     "keywords": "Kohdaioh, esp32, esp-now",
     "repository": {
@@ -14,7 +14,7 @@
     ],
     "dependencies": {
         "AMR102V": "https://github.com/AKIRA2390/AMT102V",
-        "ControlStick": "https://github.com/AKIRA2390/ControlStick",
+        "ControlStick": "https://github.com/AKIRA2390/TheRobot_ControlStick#branch",
         "ESP32Servo": "*"
     },
     "frameworks": "*",
