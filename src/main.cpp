@@ -68,7 +68,7 @@ void setup() {
   // Sticks.ThisSends2Robot(LeftHalfAddress, );
   Serial.println("started!");
 
-  kodaioh_shoulder::setup(&Sticks, &(BothHandsData.RightStick), true, true);
+  kodaioh_shoulder::setup(&Sticks, &(BothHandsData.RightStick), false, true);
 
   for (int i = 0; i < 2; i++) {
     pinMode(Pinmap.ElbowMotors[i], OUTPUT);
@@ -79,7 +79,7 @@ void setup() {
   }
 
   ElbowRoricon = new AMT102V(Pinmap.ElbowRoricon[0], Pinmap.ElbowRoricon[1]);
-  ElbowRoricon->setup(0b0000);
+  ElbowRoricon->setup(0b1100);
   attachInterrupt(Pinmap.ElbowRoricon[0], ElbowRoriconInterrupter, RISING);
   attachInterrupt(Pinmap.ElbowRoricon[1], ElbowRoriconInterrupter, RISING);
 }
@@ -204,16 +204,16 @@ void RightArmUpdate() {
   // Serial.print(kodaioh_shoulder::MotorPower*((kodaioh_shoulder::UpperArmLimitAngleRad[0]
   // -
   // kodaioh_shoulder::SensorStates.UpperArmRotationRad)/kodaioh_shoulder::UpperArmLimitAngleRad[0]));
-  Serial.println("\n");
+  // Serial.println("\n");
 
-  Serial.print("Elbow Roricon Initialized:\t");
-  Serial.println(ElbowRoriconInitialised ? "true" : "false");
-  Serial.print("Elbow Roricon Raw:\t\t");
-  Serial.println(ElbowRoricon->getRotationsDouble());
-  Serial.print("Elbow Manipulate Value:\t\t");
-  Serial.println(ElbowManipulateValue);
-  Serial.print("Elbow Angle Deg:\t\t");
-  Serial.println(SensorStates.ElbowRotationRad * RAD_TO_DEG);
+  // Serial.print("Elbow Roricon Initialized:\t");
+  // Serial.println(ElbowRoriconInitialised ? "true" : "false");
+  // Serial.print("Elbow Roricon Raw:\t\t");
+  // Serial.println(ElbowRoricon->getRotationsDouble());
+  // Serial.print("Elbow Manipulate Value:\t\t");
+  // Serial.println(ElbowManipulateValue);
+  // Serial.print("Elbow Angle Deg:\t\t");
+  // Serial.println(SensorStates.ElbowRotationRad * RAD_TO_DEG);
   // Serial.print("Elbow Limit max\t\t");
   // Serial.println(SensorStates.ElbowLimit[0]);
   // Serial.print("Elbow Limit min\t\t");
@@ -260,17 +260,17 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
     }
   }
 
-  Serial.println("//////////////////////////");
-  Serial.println("Elbow reduction ratio");
-  Serial.println(ElbowReductionRatio);
-  Serial.println("Elbow roricon initialised");
-  Serial.println(ElbowRoriconInitialised);
-  Serial.println("Elbow direction");
-  Serial.println(ElbowDirection);
-  Serial.println("Elbow testing");
-  Serial.println("Elbow manipulation vlaue");
-  Serial.println(*ElbowManipulateValue);
-  Serial.println("//////////////////////////\n");
+  // Serial.println("//////////////////////////");
+  // Serial.println("Elbow reduction ratio");
+  // Serial.println(ElbowReductionRatio);
+  // Serial.println("Elbow roricon initialised");
+  // Serial.println(ElbowRoriconInitialised);
+  // Serial.println("Elbow direction");
+  // Serial.println(ElbowDirection);
+  // Serial.println("Elbow testing");
+  // Serial.println("Elbow manipulation vlaue");
+  // Serial.println(*ElbowManipulateValue);
+  // Serial.println("//////////////////////////\n");
 }
 
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,

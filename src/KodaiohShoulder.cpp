@@ -20,7 +20,7 @@ controlstick::BothHandsData_t
 controlstick::InputData_t *InputData;
 
 const int MotorPower = 200;
-const int ShoulderMotorPower = 150;
+const int ShoulderMotorPower = 100;
 const int UpperArmMotorPower = 150;
 const double ShoulderReductionRatio = 2. / 9;
 const double UpperArmReductionRatio = 97. / 39;
@@ -49,12 +49,12 @@ void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
 
   IsDirty = true;
   // #ifdef Debug
-  Serial.println("Data Received!");
-  Serial.println("Right Hand\tRight Hand\tRight Hand\t");
-  Stick->DumpData(((controlstick::BothHandsData_t *)incomingData)->RightStick);
-  Serial.println("Left Hand\tLeft Hand\tLeft Hand\t");
-  Stick->DumpData(((controlstick::BothHandsData_t *)incomingData)->LeftStick);
-  Serial.println("\n");
+  // Serial.println("Data Received!");
+  // Serial.println("Right Hand\tRight Hand\tRight Hand\t");
+  // Stick->DumpData(((controlstick::BothHandsData_t *)incomingData)->RightStick);
+  // Serial.println("Left Hand\tLeft Hand\tLeft Hand\t");
+  // Stick->DumpData(((controlstick::BothHandsData_t *)incomingData)->LeftStick);
+  // Serial.println("\n");
   // #endif
 }
 
@@ -91,7 +91,7 @@ void setup(controlstick::ControlStick *stick,
   UpperArmRoricon =
       new AMT102V(Pinmap.UpperArmRoricon[0], Pinmap.UpperArmRoricon[1],
                   UpperArmRoriconInvert);
-  UpperArmRoricon->setup(0b0000);
+  UpperArmRoricon->setup(0b1100);
 
   attachInterrupt(Pinmap.UpperArmRoricon[0], UpperArmRoriconInterrupter,
                   RISING);
@@ -136,7 +136,7 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
   // UpdateAKIRAMethod(UpperArmManipulateValue, UpperArmManipulateValue);
   // UpdateTaishinMethod(UpperArmManipulateValue, UpperArmManipulateValue);
 
-  if (ShoulderManipulateValue > 0) {
+  if (ShoulderManipulateValue >= 0) {
     if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0]) {
       analogWrite(Pinmap.ShoulderMotors[0], ShoulderManipulateValue);
       analogWrite(Pinmap.ShoulderMotors[1], 0);
@@ -147,14 +147,14 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
   } else if (ShoulderManipulateValue < 0) {
     if (ShoulderLimitAngleRad[1] < SensorStates.ShoulderRotationRad) {
       analogWrite(Pinmap.ShoulderMotors[0], 0);
-      analogWrite(Pinmap.ShoulderMotors[1], -ShoulderManipulateValue);
+      analogWrite(Pinmap.ShoulderMotors[1], ShoulderManipulateValue);
     } else {
       analogWrite(Pinmap.ShoulderMotors[0], 0);
       analogWrite(Pinmap.ShoulderMotors[1], 0);
     }
   }
 
-  if (UpperArmManipulateValue > 0) {
+  if (UpperArmManipulateValue >= 0) {
     if (!SensorStates.UpperArmLimit[0]) {
       analogWrite(Pinmap.UpperArmMotors[0], UpperArmManipulateValue);
       analogWrite(Pinmap.UpperArmMotors[1], 0);
@@ -165,7 +165,7 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
   } else if (UpperArmManipulateValue < 0) {
     if (!SensorStates.UpperArmLimit[1]) {
       analogWrite(Pinmap.UpperArmMotors[0], 0);
-      analogWrite(Pinmap.UpperArmMotors[1], -UpperArmManipulateValue);
+      analogWrite(Pinmap.UpperArmMotors[1], UpperArmManipulateValue);
     } else {
       analogWrite(Pinmap.UpperArmMotors[0], 0);
       analogWrite(Pinmap.UpperArmMotors[1], 0);
