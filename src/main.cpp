@@ -204,16 +204,16 @@ void RightArmUpdate() {
   // Serial.print(kodaioh_shoulder::MotorPower*((kodaioh_shoulder::UpperArmLimitAngleRad[0]
   // -
   // kodaioh_shoulder::SensorStates.UpperArmRotationRad)/kodaioh_shoulder::UpperArmLimitAngleRad[0]));
-  // Serial.println("\n");
+  Serial.println("\n");
 
-  // Serial.print("Elbow Roricon Initialized:\t");
-  // Serial.println(ElbowRoriconInitialised ? "true" : "false");
+  Serial.print("Elbow Roricon Initialized:\t");
+  Serial.println(ElbowRoriconInitialised ? "true" : "false");
   // Serial.print("Elbow Roricon Raw:\t\t");
   // Serial.println(ElbowRoricon->getRotationsDouble());
-  // Serial.print("Elbow Manipulate Value:\t\t");
-  // Serial.println(ElbowManipulateValue);
-  // Serial.print("Elbow Angle Deg:\t\t");
-  // Serial.println(SensorStates.ElbowRotationRad * RAD_TO_DEG);
+  Serial.print("Elbow Manipulate Value:\t\t");
+  Serial.println(ElbowManipulateValue);
+  Serial.print("Elbow Angle Deg:\t\t");
+  Serial.println(SensorStates.ElbowRotationRad * RAD_TO_DEG);
   // Serial.print("Elbow Limit max\t\t");
   // Serial.println(SensorStates.ElbowLimit[0]);
   // Serial.print("Elbow Limit min\t\t");
@@ -279,15 +279,11 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                                       UpperArmManipulateValue);
 
   if (BothHandsData.RightStick.ButtonState[3]) {
-    if (SensorStates.ElbowLimit[0]) {
-      analogWrite(Pinmap.ElbowMotors[0], kodaioh_shoulder::MotorPower);
-      analogWrite(Pinmap.ElbowMotors[1], 0);
-    }
+    ElbowManipulateValue = ElbowMotorPower;
   } else if (BothHandsData.RightStick.ButtonState[2]) {
-    if (SensorStates.ElbowLimit[1]) {
-      analogWrite(Pinmap.ElbowMotors[0], 0);
-      analogWrite(Pinmap.ElbowMotors[1], kodaioh_shoulder::MotorPower);
-    }
+    ElbowManipulateValue = -ElbowMotorPower;
+  } else {
+    ElbowManipulateValue = 0;
   }
 }
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
