@@ -193,10 +193,10 @@ void RightArmUpdate() {
   // Serial.print("\t");
   // Serial.println(kodaioh_shoulder::UpperArmLimitAngleRad[1]*RAD_TO_DEG);
 
-  // Serial.print("UpperArm Limit Stats:\t");
-  // Serial.print(kodaioh_shoulder::SensorStates.UpperArmLimit[0]);
-  // Serial.print("\t");
-  // Serial.println(kodaioh_shoulder::SensorStates.UpperArmLimit[1]);
+  Serial.print("UpperArm Limit Stats:\t");
+  Serial.print(kodaioh_shoulder::SensorStates.UpperArmLimit[0]);
+  Serial.print("\t");
+  Serial.println(kodaioh_shoulder::SensorStates.UpperArmLimit[1]);
   // Serial.print("UpperArm Error Value:\t\t");
   // Serial.print((kodaioh_shoulder::UpperArmLimitAngleRad[0] -
   // kodaioh_shoulder::SensorStates.UpperArmRotationRad)*RAD_TO_DEG);
