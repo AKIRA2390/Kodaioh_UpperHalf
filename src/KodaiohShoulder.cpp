@@ -156,23 +156,25 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
     analogWrite(Pinmap.ShoulderMotors[0], 0);
     analogWrite(Pinmap.ShoulderMotors[1], 0);
   }
-  
+
   if (UpperArmRoriconInitialised) {
     if (UpperArmManipulateValue >= 0) {
-      if (!SensorStates.UpperArmLimit[0]) {
-        analogWrite(Pinmap.UpperArmMotors[0], UpperArmManipulateValue);
+      if (SensorStates.UpperArmLimit[0] ||
+          SensorStates.UpperArmRotationRad > UpperArmLimitAngleRad[0]) {
+        analogWrite(Pinmap.UpperArmMotors[0], 0);
         analogWrite(Pinmap.UpperArmMotors[1], 0);
       } else {
-        analogWrite(Pinmap.UpperArmMotors[0], 0);
+        analogWrite(Pinmap.UpperArmMotors[0], UpperArmManipulateValue);
         analogWrite(Pinmap.UpperArmMotors[1], 0);
       }
     } else if (UpperArmManipulateValue < 0) {
-      if (!SensorStates.UpperArmLimit[1]) {
-        analogWrite(Pinmap.UpperArmMotors[0], 0);
-        analogWrite(Pinmap.UpperArmMotors[1], UpperArmManipulateValue);
-      } else {
+      if (SensorStates.UpperArmLimit[1] ||
+          UpperArmLimitAngleRad[1] > SensorStates.UpperArmRotationRad) {
         analogWrite(Pinmap.UpperArmMotors[0], 0);
         analogWrite(Pinmap.UpperArmMotors[1], 0);
+      } else {
+        analogWrite(Pinmap.UpperArmMotors[0], 0);
+        analogWrite(Pinmap.UpperArmMotors[1], UpperArmManipulateValue);
       }
     }
   } else {
