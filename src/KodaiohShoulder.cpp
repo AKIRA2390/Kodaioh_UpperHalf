@@ -111,19 +111,34 @@ void update() {
     ShoulderRoriconInitialised = true;
     ShoulderRoricon->resetRotation();
   }
+  
   if (SensorStates.UpperArmLimit[1]) {
     UpperArmRoriconInitialised = true;
-    UpperArmRoricon->resetRotation();
+    SensorStates.ShoulderRotationRad = UpperArmLimitAngleRad[0];
+  }
+  if (SensorStates.UpperArmLimit[0]) {
+    UpperArmRoriconInitialised = true;
+    SensorStates.ShoulderRotationRad = UpperArmLimitAngleRad[1];
   }
 
+  double ShoulderRoriconRotationDelta, UpperArmRoriconRotationDelta;
+  ShoulderRoriconRotationDelta = SensorStates.ShoulderRoriconRotationPrev -
+                                 ShoulderRoricon->getRotationsDouble();
+  UpperArmRoriconRotationDelta = SensorStates.UpperArmRoriconRotationPrev -
+                                 UpperArmRoricon->getRotationsDouble();
+
   if (ShoulderRoriconInitialised)
-    SensorStates.ShoulderRotationRad =
-        (ShoulderRoricon->getRotationsDouble() / ShoulderReductionRatio) * 2 *
-        PI;
+    SensorStates.ShoulderRotationRad +=
+        (ShoulderRoriconRotationDelta / ShoulderReductionRatio) * 2 * PI;
+
   if (UpperArmRoriconInitialised)
-    SensorStates.UpperArmRotationRad =
-        (UpperArmRoricon->getRotationsDouble() / UpperArmReductionRatio) * 2 *
-        PI;
+    SensorStates.UpperArmRotationRad +=
+        (UpperArmRoriconRotationDelta / UpperArmReductionRatio) * 2 * PI;
+
+  SensorStates.ShoulderRoriconRotationPrev =
+      ShoulderRoricon->getRotationsDouble();
+  SensorStates.UpperArmRoriconRotationPrev =
+      UpperArmRoricon->getRotationsDouble();
 #ifdef Debug
 #endif
 }

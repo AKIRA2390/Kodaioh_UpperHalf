@@ -23,6 +23,7 @@ typedef struct Pinmap_t {
 typedef struct ShoulderSensorStates {
   bool ShoulderLimit, UpperArmLimit[2];
   double ShoulderRotationRad, UpperArmRotationRad;
+  double ShoulderRoriconRotationPrev, UpperArmRoriconRotationPrev;
 } ShoulderSensorStates;
 
 extern Pinmap_t Pinmap;
