@@ -69,7 +69,7 @@ void setup() {
   // Sticks.ThisSends2Robot(LeftHalfAddress, );
   Serial.println("started!");
 
-  kodaioh_shoulder::setup(&Sticks, &(BothHandsData.RightStick), true, true);
+  kodaioh_shoulder::setup(&Sticks, &(BothHandsData.RightStick), true, false);
 
   for (int i = 0; i < 2; i++) {
     pinMode(Pinmap.ElbowMotors[i], OUTPUT);
@@ -105,11 +105,11 @@ void loop() {
 
   // Sticks.SendData2Robot(BothHandsData);
 
+    RightArmUpdate();
   if (kodaioh_shoulder::IsDirty) {
     Serial.println("is dirty");
     kodaioh_shoulder::GetBothHandsData(&BothHandsData);
 
-    RightArmUpdate();
     LeftArmUpdate();
 
     kodaioh_shoulder::UpdateWhenDirty(ShoulderManipulateValue,
@@ -132,9 +132,9 @@ void RightArmUpdate() {
                           &ElbowManipulateValue);
 
   Serial.println("right arm update");
-  // UpdateTestDummy(&ShoulderManipulateValue, &UpperArmManipulateValue,
-  //                 &ElbowManipulateValue);
-  UpdateAKIRAMethod(&ShoulderManipulateValue, &UpperArmManipulateValue);
+  UpdateTestDummy(&ShoulderManipulateValue, &UpperArmManipulateValue,
+                  &ElbowManipulateValue);
+  // UpdateAKIRAMethod(&ShoulderManipulateValue, &UpperArmManipulateValue);
 
   if (ElbowManipulateValue > 0) {
     if (!SensorStates.ElbowLimit[0]) {
@@ -250,6 +250,8 @@ void PrintVariousThings(){
   // Serial.print(kodaioh_shoulder::ShoulderLimitAngleRad[0] * RAD_TO_DEG);
   // Serial.print("\t");
   // Serial.println(kodaioh_shoulder::ShoulderLimitAngleRad[1] * RAD_TO_DEG);
+  Serial.print("Shoulder Limit Stats:\t");
+  Serial.print(kodaioh_shoulder::SensorStates.ShoulderLimit);
   // Serial.print("Shoulder Error Value:\t\t");
   // Serial.print((kodaioh_shoulder::ShoulderLimitAngleRad[0] -
   //               kodaioh_shoulder::SensorStates.ShoulderRotationRad) *

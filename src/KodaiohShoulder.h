@@ -8,8 +8,8 @@ namespace kodaioh_shoulder {
 typedef struct Pinmap_t {
   // output pins //
   // plus, minus
-  const int ShoulderMotors[2] = {32, 33};
-  const int UpperArmMotors[2] = {25, 26};
+  const int ShoulderMotors[2] = {33, 32};
+  const int UpperArmMotors[2] = {26, 25};
 
   // input pins //
   const int ShoulderRoricon[2] = {36, 39};
