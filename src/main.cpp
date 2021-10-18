@@ -105,10 +105,17 @@ void loop() {
 
   // Sticks.SendData2Robot(BothHandsData);
 
-    RightArmUpdate();
+#ifdef Debug
+  RightArmUpdate();
+#endif
+
   if (kodaioh_shoulder::IsDirty) {
     Serial.println("is dirty");
     kodaioh_shoulder::GetBothHandsData(&BothHandsData);
+
+#ifndef Debug
+    RightArmUpdate();
+#endif
 
     LeftArmUpdate();
 
@@ -132,9 +139,13 @@ void RightArmUpdate() {
                           &ElbowManipulateValue);
 
   Serial.println("right arm update");
+
+#ifdef Debug
   UpdateTestDummy(&ShoulderManipulateValue, &UpperArmManipulateValue,
                   &ElbowManipulateValue);
-  // UpdateAKIRAMethod(&ShoulderManipulateValue, &UpperArmManipulateValue);
+#else
+  UpdateAKIRAMethod(&ShoulderManipulateValue, &UpperArmManipulateValue);
+#endif
 
   if (ElbowManipulateValue > 0) {
     if (!SensorStates.ElbowLimit[0]) {
@@ -162,14 +173,16 @@ void LeftArmUpdate() {
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue,
                      double *ElbowManipulateValue) {
-  const bool ElbowTesting = false;
+  const bool ShoulderTesting = false, UpperArmTesting = true,
+             ElbowTesting = false;
   static bool ElbowDirection = true;
 
   kodaioh_shoulder::IsDirty = true;
 
   Serial.println("right arm test dummy");
   kodaioh_shoulder::UpdateTestDummy(ShoulderManipulateValue,
-                                    UpperArmManipulateValue);
+                                    UpperArmManipulateValue, ShoulderTesting,
+                                    UpperArmTesting);
 
   if (SensorStates.ElbowLimit[0]) {
     ElbowDirection = false;
@@ -234,7 +247,7 @@ void SwordDrawingProcedure(double *ShoulderManipulateValue,
                        ElbowManipulateValue);
 }
 
-void PrintVariousThings(){
+void PrintVariousThings() {
   // Serial.println("\n");
   // Serial.print("Shoulder Roricon Raw:\t\t");
   // Serial.println(kodaioh_shoulder::ShoulderRoricon->getRotationsDouble());

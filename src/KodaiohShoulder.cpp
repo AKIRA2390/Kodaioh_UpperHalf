@@ -237,8 +237,8 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
 }
 
 void UpdateTestDummy(double *ShoulderManipulateValue,
-                     double *UpperArmManipulateValue) {
-  const bool ShoulderTesting = false, UpperArmTesting = true;
+                     double *UpperArmManipulateValue, bool ShoulderTesting,
+                     bool UpperArmTesting) {
   static bool ShoulderDirection = true, UpperArmDirection = true;
 
   Serial.println("shoulder unit test dummy");

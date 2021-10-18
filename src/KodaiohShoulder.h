@@ -56,14 +56,16 @@ void update();
 void UpdateWhenDirty(double ShoulderManipulateValue,
                      double UpperArmManipulateValue);
 void UpdateTestDummy(double *ShoulderManipulateValue,
-                     double *UpperArmManipulateValue);
+                     double *UpperArmManipulateValue,
+                     bool ShoulderTesting = false,
+                     bool UpperArmTesting = false);
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue);
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue);
 
 void Update4ShoulderUnitReset(double *ShoulderManipulateValue,
-                         double *UpperArmManipulateValue);
+                              double *UpperArmManipulateValue);
 
 void GetBothHandsData(controlstick::BothHandsData_t *Value);
 }  // namespace kodaioh_shoulder
