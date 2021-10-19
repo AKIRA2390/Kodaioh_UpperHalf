@@ -35,6 +35,8 @@ AMT102V *ShoulderRoricon, *UpperArmRoricon;
 void ShoulderRoriconInterrupter() { ShoulderRoricon->update(); }
 void UpperArmRoriconInterrupter() { UpperArmRoricon->update(); }
 
+PID4arduino<int> *ShoulderPID, *UpperArmPID;
+
 void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status) {
   // #ifdef Debug
   //   Serial.print("\r\nLast Packet Send Status:\t");
@@ -96,6 +98,9 @@ void setup(controlstick::ControlStick *stick,
                   RISING);
   attachInterrupt(Pinmap.UpperArmRoricon[1], UpperArmRoriconInterrupter,
                   RISING);
+
+  ShoulderPID->setGains(1, 0, 0);
+  UpperArmPID->setGains(1, 0, 0);
 }
 
 void update() {

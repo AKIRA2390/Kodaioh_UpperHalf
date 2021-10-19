@@ -3,6 +3,7 @@
 
 #include "AMT102V.h"
 #include "ControlStick.h"
+#include "PID4arduino.h"
 
 namespace kodaioh_shoulder {
 typedef struct Pinmap_t {
@@ -34,6 +35,8 @@ extern controlstick::BothHandsData_t BothHandsData;
 extern controlstick::InputData_t *InputData;
 
 extern AMT102V *ShoulderRoricon, *UpperArmRoricon;
+
+extern PID4arduino<int> *ShoulderPID, *UpperArmPID;
 
 extern const int MotorPower;
 extern const double ShoulderReductionRatio;
