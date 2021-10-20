@@ -3,7 +3,10 @@
 
 #include "AMT102V.h"
 #include "ControlStick.h"
+
+//
 #include "PID4arduino.h"
+//
 
 namespace kodaioh_shoulder {
 typedef struct Pinmap_t {
@@ -34,9 +37,23 @@ extern controlstick::ControlStick *Stick;
 extern controlstick::BothHandsData_t BothHandsData;
 extern controlstick::InputData_t *InputData;
 
+
+extern const int MotorPower;
+extern const int ShoulderMotorPower;
+extern const int UpperArmMotorPower;
+extern const double ShoulderReductionRatio;
+extern const double UpperArmReductionRatio;
+extern const double ShoulderLimitAngleRad[2];
+extern const double UpperArmLimitAngleRad[2];
+
 extern AMT102V *ShoulderRoricon, *UpperArmRoricon;
 
-extern PID4arduino<int> *ShoulderPID, *UpperArmPID;
+//
+extern PID4Arduino::PID4arduino<int> *ShoulderPID, *UpperArmPID;
+extern PID4Arduino::PIDGain_t ShoulderPIDGains, UpperArmPIDGains;
+
+extern int ShoulderTargetDeg, UpperArmTargetDeg;
+//
 
 extern const int MotorPower;
 extern const double ShoulderReductionRatio;
@@ -50,6 +67,11 @@ extern bool ShoulderRoriconInitialised, UpperArmRoriconInitialised;
 void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status);
 void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len);
 
+//
+void setPIDGains(PID4Arduino::PIDGain_t ShoulderPIDGains,
+                 PID4Arduino::PIDGain_t UpperArmPIDGains);
+//
+
 void setup(controlstick::ControlStick *stick,
            controlstick::InputData_t *input_data,
            bool ShoulderRoriconInvert = false,
@@ -58,6 +80,7 @@ void update();
 
 void UpdateWhenDirty(double ShoulderManipulateValue,
                      double UpperArmManipulateValue);
+
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue,
                      bool ShoulderTesting = false,

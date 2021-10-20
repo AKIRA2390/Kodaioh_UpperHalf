@@ -5,6 +5,10 @@
 #include "ControlStick.h"
 #include "KodaiohShoulder.h"
 
+//
+#include "PID4arduino.h"
+//
+
 #define Debug
 typedef struct RightHalfPinmap_t {
   // output pins //
@@ -39,6 +43,11 @@ bool SwordDrawInProgress = false, SwordDrawCompleted = false;
 
 AMT102V *ElbowRoricon;
 
+//
+extern PID4Arduino::PID4arduino<int> *ElbowPID;
+PID4Arduino::PIDGain_t ShoulderPIDGain, UpperArmPIDGain, ElbowPIDGain;
+//
+
 // const double ElbowReductionRatio = 3. / 760;
 const double ElbowReductionRatio = 38. / 15;
 const double ElbowLimitAngleRad[2] = {90 * DEG_TO_RAD, 0 * DEG_TO_RAD};
@@ -68,6 +77,24 @@ void setup() {
   Serial.begin(115200);
   // Sticks.ThisSends2Robot(LeftHalfAddress, );
   Serial.println("started!");
+
+//
+  ShoulderPIDGain.KP =
+      kodaioh_shoulder::ShoulderMotorPower /
+      (abs(kodaioh_shoulder::ShoulderLimitAngleRad[0] * RAD_TO_DEG) +
+       abs(kodaioh_shoulder::ShoulderLimitAngleRad[1] * RAD_TO_DEG));
+  ShoulderPIDGain.KI = 30;
+  ShoulderPIDGain.KD = 30;
+  
+  UpperArmPIDGain.KP =
+      kodaioh_shoulder::UpperArmMotorPower /
+      (abs(kodaioh_shoulder::UpperArmLimitAngleRad[0] * RAD_TO_DEG) +
+       abs(kodaioh_shoulder::UpperArmLimitAngleRad[1] * RAD_TO_DEG));
+  UpperArmPIDGain.KI = 30;
+  UpperArmPIDGain.KD = 30;
+
+  kodaioh_shoulder::setPIDGains(ShoulderPIDGain, UpperArmPIDGain);
+//
 
   kodaioh_shoulder::setup(&Sticks, &(BothHandsData.RightStick), true, false);
 

@@ -15,8 +15,6 @@ ShoulderSensorStates SensorStates = {};
 
 controlstick::ControlStick *Stick;
 controlstick::BothHandsData_t BothHandsData;
-controlstick::BothHandsData_t
-    BothHandsDataWhichOnlyExistsForTheSizeCalclationLol;
 controlstick::InputData_t *InputData;
 
 const int MotorPower = 200;
@@ -35,7 +33,12 @@ AMT102V *ShoulderRoricon, *UpperArmRoricon;
 void ShoulderRoriconInterrupter() { ShoulderRoricon->update(); }
 void UpperArmRoriconInterrupter() { UpperArmRoricon->update(); }
 
-PID4arduino<int> *ShoulderPID, *UpperArmPID;
+//
+PID4Arduino::PID4arduino<int> *ShoulderPID, *UpperArmPID;
+PID4Arduino::PIDGain_t ShoulderPIDGains = {}, UpperArmPIDGains = {};
+
+int ShoulderTargetDeg = 0, UpperArmTargetDeg = 0;
+//
 
 void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status) {
   // #ifdef Debug
@@ -58,6 +61,14 @@ void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
   // Hand\t"); Stick->DumpData(((controlstick::BothHandsData_t
   // *)incomingData)->LeftStick); Serial.println("\n"); #endif
 }
+
+//
+void setPIDGains(PID4Arduino::PIDGain_t shoulderPIDGains,
+                 PID4Arduino::PIDGain_t upperArmPIDGains) {
+  memcpy(&ShoulderPIDGains, &shoulderPIDGains, sizeof(ShoulderPIDGains));
+  memcpy(&UpperArmPIDGains, &upperArmPIDGains, sizeof(UpperArmPIDGains));
+}
+//
 
 void setup(controlstick::ControlStick *stick,
            controlstick::InputData_t *input_data, bool ShoulderRoriconInvert,
@@ -99,8 +110,10 @@ void setup(controlstick::ControlStick *stick,
   attachInterrupt(Pinmap.UpperArmRoricon[1], UpperArmRoriconInterrupter,
                   RISING);
 
-  ShoulderPID->setGains(1, 0, 0);
-  UpperArmPID->setGains(1, 0, 0);
+  //
+  ShoulderPID->setGains(ShoulderPIDGains);
+  UpperArmPID->setGains(UpperArmPIDGains);
+  //
 }
 
 void update() {
@@ -146,6 +159,11 @@ void update() {
       UpperArmRoricon->getRotationsDouble();
 #ifdef Debug
 #endif
+
+  //
+  ShoulderPID->update(ShoulderTargetDeg, SensorStates.ShoulderRotationRad);
+  UpperArmPID->update(UpperArmTargetDeg, SensorStates.UpperArmRotationRad);
+  //
 }
 
 void UpdateWhenDirty(double ShoulderManipulateValue,
@@ -295,7 +313,12 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
 }
 
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
-                         double *UpperArmManipulateValue) {}
+                         double *UpperArmManipulateValue) {
+  // ShoulderTargetDeg = 20;
+
+  *ShoulderManipulateValue = ShoulderPID->GetValue();
+  *UpperArmManipulateValue = UpperArmPID->GetValue();
+}
 
 void Update4ShoulderUnitReset(double *ShoulderManipulateValue,
                               double *UpperArmManipulateValue) {
