@@ -4,9 +4,11 @@
 
 #include <vector>
 
-#include "MotionManager.h"
-
 namespace axialmovement {
+
+typedef struct Movement_t {
+  int MovementStartDeg = 0, MovementTargetDeg = 0, MovementDulationTime = 0;
+} Movement_t;
 
 class AxialMovement {
  private:
@@ -15,7 +17,7 @@ class AxialMovement {
   uint64_t BaseTime = 0;
   bool isMoving = false;
 
-  std::vector<motionmanager::Movement_t> MovementTasks;
+  std::vector<Movement_t> MovementTasks;
 
   void setAsMoving();
   void setAsNotMoving();
@@ -24,9 +26,9 @@ class AxialMovement {
   AxialMovement();
   ~AxialMovement();
 
-  void update(double rotation_deg, double *shoulder_target_deg);
+  void update(double rotation_deg, int *shoulder_target_deg);
 
-  void loadMove(std::vector<motionmanager::Movement_t> movement_data);
+  void loadMove(std::vector<Movement_t> movement_data);
   void startMovement();
   void reset();
 

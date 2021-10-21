@@ -7,16 +7,12 @@
 
 namespace motionmanager {
 
-typedef struct Movement_t {
-  int MovementStartDeg = 0, MovementTargetDeg = 0, MovementDulationTime = 0;
-} Movement_t;
-
 typedef struct MovementsData_t {
-  std::vector<Movement_t> Shoulder, UpperArm, Elbow;
+  std::vector<axialmovement::Movement_t> Shoulder, UpperArm, Elbow;
 } MovementsData_t;
 
 typedef struct AngleDatas_t {
-  double ShouderRotationDeg, UpperArmRotationDeg, ElbowRotationDeg;
+  double ShoulderRotationDeg, UpperArmRotationDeg, ElbowRotationDeg;
 } AngleDatas_t;
 
 class MotionManager {
@@ -25,16 +21,18 @@ class MotionManager {
   MovementsData_t MovementsData;
   const bool HasElbow = false;
   bool MovementInProgress = false;
-  double *ShoulderMV, *UpperArmMV, *ElbowMV;
+  int *ShoulderTD, *UpperArmTD, *ElbowTD;
 
  public:
   MotionManager(bool hasElbow);
   ~MotionManager(){};
-  void setup(double *shouder_MV, double *upper_arm_MV, double *elbow_MV);
+  void setup(int *shoulder_TD, int *upper_arm_TD, int *elbow_TD);
   void update(AngleDatas_t angle_datas);
 
   void StartMove(MovementsData_t movement_datas);
-  void addMove(std::vector<Movement_t> &movement_data, Movement_t move);
+  bool IsBusy();
 };
 
+void addMove(std::vector<axialmovement::Movement_t> &movement_data,
+             axialmovement::Movement_t move);
 }  // namespace motionmanager

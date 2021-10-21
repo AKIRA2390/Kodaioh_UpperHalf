@@ -1,6 +1,6 @@
 {
     "name": "KodaiohShoulder",
-    "version": "4.3.6",
+    "version": "4.3.7",
     "description": "codes to use Kohdaioh Shoulder",
     "keywords": "Kohdaioh, esp32, esp-now",
     "repository": {
@@ -23,7 +23,9 @@
     "export": {
         "include": [
             "library.json",
-            "src/KodaiohShoulder.*"
+            "src/KodaiohShoulder.*",
+            "src/MotionManager.*",
+            "src/AxialMovement.*"
         ]
     }
 }

@@ -4,6 +4,7 @@
 #include "AMT102V.h"
 #include "ControlStick.h"
 #include "KodaiohShoulder.h"
+#include "MotionDatas.h"
 #include "MotionManager.h"
 
 //
@@ -35,7 +36,10 @@ controlstick::BothHandsData_t BothHandsData;
 
 AMT102V *ElbowRoricon;
 
+//
 motionmanager::MotionManager Motion(true);
+motionmanager::AngleDatas_t AngleDatas;
+//
 
 // uint8_t LeftHalfAddress[] = {0xEC, 0x94, 0xCB, 0x6E, 0x29, 0x70};
 uint8_t LeftHalfAddress[] = {0x24, 0x0A, 0xC4, 0xF9, 0x40, 0xD0};
@@ -48,8 +52,10 @@ bool ElbowRoriconInitialised = false;
 bool SwordDrawInProgress = false, SwordDrawCompleted = false;
 
 //
-extern PID4Arduino::PID4arduino<int> *ElbowPID;
+extern PID4Arduino::PID4arduino<int> ElbowPID;
 PID4Arduino::PIDGain_t ShoulderPIDGain, UpperArmPIDGain, ElbowPIDGain;
+
+int ElbowTargetDeg = 0;
 //
 
 // const double ElbowReductionRatio = 3. / 760;
@@ -67,7 +73,8 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue);
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
-                         double *UpperArmManipulateValue);
+                         double *UpperArmManipulateValue,
+                         double *ElbowManipulateValue);
 void Update4RightArmReset(double *ShoulderManipulateValue,
                           double *UpperArmManipulateValue,
                           double *ElbowManipulateValue);
@@ -97,7 +104,18 @@ void setup() {
   UpperArmPIDGain.KI = 30;
   UpperArmPIDGain.KD = 30;
 
+  ElbowPIDGain.KP = ElbowMotorPower / (abs(ElbowLimitAngleRad[0] * RAD_TO_DEG) +
+                                       abs(ElbowLimitAngleRad[1] * RAD_TO_DEG));
+  ElbowPIDGain.KI = 30;
+  ElbowPIDGain.KD = 30;
+
+  motion_datas::setup();
+
+  Motion.setup(&kodaioh_shoulder::ShoulderTargetDeg,
+               &kodaioh_shoulder::UpperArmTargetDeg, &ElbowTargetDeg);
+
   kodaioh_shoulder::setPIDGains(ShoulderPIDGain, UpperArmPIDGain);
+  ElbowPID.setGains(ElbowPIDGain);
   //
 
   kodaioh_shoulder::setup(&Sticks, &(BothHandsData.RightStick), true, false);
@@ -132,6 +150,16 @@ void loop() {
     SensorStates.ElbowRotationRad =
         (ElbowRoricon->getRotationsDouble() / ElbowReductionRatio) * 2 * PI;
 
+  //
+  AngleDatas.ShoulderRotationDeg =
+      kodaioh_shoulder::SensorStates.ShoulderRotationRad * RAD_TO_DEG;
+  AngleDatas.UpperArmRotationDeg =
+      kodaioh_shoulder::SensorStates.UpperArmRotationRad * RAD_TO_DEG;
+  AngleDatas.ElbowRotationDeg = SensorStates.ElbowRotationRad * RAD_TO_DEG;
+
+  Motion.update(AngleDatas);
+  //
+
   kodaioh_shoulder::update();
 
   // Sticks.SendData2Robot(BothHandsData);
@@ -160,6 +188,9 @@ void loop() {
     Serial.println("Left Hands Received Data:");
     Sticks.DumpData(BothHandsData.LeftStick);
   }
+
+  ElbowPID.update(ElbowTargetDeg, SensorStates.ElbowRotationRad);
+
   delay(100);
 }
 
@@ -256,9 +287,13 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
   }
 }
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
-                         double *UpperArmManipulateValue) {
+                         double *UpperArmManipulateValue,
+                         double *ElbowManipulateValue) {
+  if (!Motion.IsBusy()) {
+  }
   kodaioh_shoulder::UpdateTaishinMethod(ShoulderManipulateValue,
                                         UpperArmManipulateValue);
+  *ElbowManipulateValue = ElbowPID.GetValue();
 }
 void Update4RightArmReset(double *ShoulderManipulateValue,
                           double *UpperArmManipulateValue,

@@ -39,7 +39,6 @@ extern controlstick::ControlStick *Stick;
 extern controlstick::BothHandsData_t BothHandsData;
 extern controlstick::InputData_t *InputData;
 
-
 extern const int MotorPower;
 extern const int ShoulderMotorPower;
 extern const int UpperArmMotorPower;

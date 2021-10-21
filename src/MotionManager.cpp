@@ -8,14 +8,20 @@
 namespace motionmanager {
 MotionManager::MotionManager(bool hasElbow) : HasElbow(hasElbow){};
 
-void MotionManager::setup(double *shouder_MV, double *upper_arm_MV,
-                          double *elbow_MV) {}
+void MotionManager::setup(int *shoulder_TD, int *upper_arm_TD, int *elbow_TD) {
+  ShoulderTD = shoulder_TD;
+  UpperArmTD = upper_arm_TD;
+  if (HasElbow) {
+    ElbowTD = elbow_TD;
+  }
+}
+
 void MotionManager::update(AngleDatas_t angle_datas) {
   if (MovementInProgress) {
-    Shoulder.update(angle_datas.ShouderRotationDeg, ShoulderMV);
-    UpperArm.update(angle_datas.UpperArmRotationDeg, UpperArmMV);
+    Shoulder.update(angle_datas.ShoulderRotationDeg, ShoulderTD);
+    UpperArm.update(angle_datas.UpperArmRotationDeg, UpperArmTD);
     if (HasElbow) {
-      Elbow.update(angle_datas.ElbowRotationDeg, ElbowMV);
+      Elbow.update(angle_datas.ElbowRotationDeg, ElbowTD);
     }
 
     if (Shoulder.isFreeToMove() && UpperArm.isFreeToMove()) {
@@ -49,9 +55,10 @@ void MotionManager::StartMove(MovementsData_t movement_datas) {
     Elbow.startMovement();
   }
 }
+bool MotionManager::IsBusy() { return MovementInProgress; }
 
-void MotionManager::addMove(std::vector<Movement_t> &movement_data,
-                            Movement_t move) {
+void addMove(std::vector<axialmovement::Movement_t> &movement_data,
+             axialmovement::Movement_t move) {
   movement_data.push_back(move);  //アヤシイ...動かなさそうな気がする
 }
 }  // namespace motionmanager
