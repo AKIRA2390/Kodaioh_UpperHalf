@@ -11,13 +11,18 @@ MotionManager::MotionManager(bool hasElbow) : HasElbow(hasElbow){};
 
 void MotionManager::setup() {}
 void MotionManager::update() {}
+
+void MotionManager::addMove(std::vector<Movement_t> &movement_data,
+                            Movement_t move) {
+  movement_data.push_back(move);  //アヤシイ...動かなさそうな気がする
+}
 }  // namespace motionmanager
 
 /*
 AxialMovementの使い方
 
 Movement_tのvectorを作る
-AxialMovement.addMoveをつかってぽいぽい追加していく(push_backのがよさそう)
+addMoveをつかってぽいぽい追加していく(push_backのがよさそう)
 追加し終わったらもっとく
 
 loadMoveでMotionデータを読み込む

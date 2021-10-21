@@ -35,7 +35,7 @@ void AxialMovement::update(double rotation_deg, int *shoulder_target_deg) {
   *shoulder_target_deg = DeltaTargetDeg;
 }
 
-void AxialMovement::loadMove(std::vector<Movement_t> movement_data) {
+void AxialMovement::loadMove(std::vector<motionmanager::Movement_t> movement_data) {
   for (int i = 0; i < movement_data.size(); i++) {
     DulationTimeAll += (movement_data.at(i)).MovementDulationTime;
   }
@@ -50,10 +50,6 @@ void AxialMovement::reset() {
   DulationTimeAll = 0, DulationTimeTemp = 0, BaseTime = 0, isMoving = false;
 }
 
-void AxialMovement::addMove(std::vector<Movement_t> &movement_data,
-                            Movement_t move) {
-  movement_data.push_back(move);  //アヤシイ...動かなさそうな気がする
-}
 
 void AxialMovement::setAsMoving() { isMoving = true; }
 void AxialMovement::setAsNotMoving() { isMoving = false; }
