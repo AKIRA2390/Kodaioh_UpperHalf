@@ -1,11 +1,7 @@
 #include "MotionManager.h"
 
 #include <Arduino.h>
-#include <ESP32Servo.h>
-
 #include "KodaiohShoulder.h"
-#include "PID4arduino.h"
-
 namespace motionmanager {
 MotionManager::MotionManager(bool hasElbow) : HasElbow(hasElbow){};
 

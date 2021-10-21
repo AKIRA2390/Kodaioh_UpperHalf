@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Arduino.h>
-#include <ESP32Servo.h>
 
 #include "KodaiohShoulder.h"
 #include "PID4arduino.h"

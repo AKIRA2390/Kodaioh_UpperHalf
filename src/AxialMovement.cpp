@@ -1,10 +1,6 @@
 #include "AxialMovement.h"
 
 #include <Arduino.h>
-#include <ESP32Servo.h>
-
-#include "KodaiohShoulder.h"
-#include "PID4arduino.h"
 
 namespace axialmovement {
 AxialMovement::AxialMovement() {}
@@ -35,7 +31,8 @@ void AxialMovement::update(double rotation_deg, int *shoulder_target_deg) {
   *shoulder_target_deg = DeltaTargetDeg;
 }
 
-void AxialMovement::loadMove(std::vector<motionmanager::Movement_t> movement_data) {
+void AxialMovement::loadMove(
+    std::vector<motionmanager::Movement_t> movement_data) {
   for (int i = 0; i < movement_data.size(); i++) {
     DulationTimeAll += (movement_data.at(i)).MovementDulationTime;
   }
@@ -49,7 +46,6 @@ void AxialMovement::reset() {
   NowTargetDeg = 0, DeltaTargetDeg = 0, MovementStepNow = 0,
   DulationTimeAll = 0, DulationTimeTemp = 0, BaseTime = 0, isMoving = false;
 }
-
 
 void AxialMovement::setAsMoving() { isMoving = true; }
 void AxialMovement::setAsNotMoving() { isMoving = false; }
