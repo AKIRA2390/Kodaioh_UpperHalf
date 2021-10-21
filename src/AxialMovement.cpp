@@ -6,7 +6,7 @@ namespace axialmovement {
 AxialMovement::AxialMovement() {}
 AxialMovement::~AxialMovement() {}
 
-void AxialMovement::update(double rotation_deg, int *shoulder_target_deg) {
+void AxialMovement::update(double rotation_deg, double *shoulder_target_deg) {
   if (isFreeToMove()) return;
 
   uint64_t internalClock = millis() - BaseTime;
