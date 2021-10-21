@@ -290,6 +290,27 @@ void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue,
                          double *ElbowManipulateValue) {
   if (!Motion.IsBusy()) {
+    if (BothHandsData.RightStick.ButtonState[0])
+      Motion.StartMove(motion_datas::Empty);
+    if (BothHandsData.RightStick.ButtonState[1])
+      Motion.StartMove(motion_datas::Empty);
+    if (BothHandsData.RightStick.ButtonState[2])
+      Motion.StartMove(motion_datas::Empty);
+    if (BothHandsData.RightStick.ButtonState[3])
+      Motion.StartMove(motion_datas::Empty);
+    if (BothHandsData.RightStick.ButtonState[4])
+      Motion.StartMove(motion_datas::Empty);
+
+    if (BothHandsData.LeftStick.ButtonState[0])
+      Motion.StartMove(motion_datas::Empty);
+    if (BothHandsData.LeftStick.ButtonState[1])
+      Motion.StartMove(motion_datas::Empty);
+    if (BothHandsData.LeftStick.ButtonState[2])
+      Motion.StartMove(motion_datas::Empty);
+    if (BothHandsData.LeftStick.ButtonState[3])
+      Motion.StartMove(motion_datas::Empty);
+    if (BothHandsData.LeftStick.ButtonState[4])
+      Motion.StartMove(motion_datas::Empty);
   }
   kodaioh_shoulder::UpdateTaishinMethod(ShoulderManipulateValue,
                                         UpperArmManipulateValue);

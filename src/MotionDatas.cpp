@@ -11,5 +11,6 @@ motionmanager::MovementsData_t ThrowTheSwordAway;
 motionmanager::MovementsData_t TakeThePose;
 motionmanager::MovementsData_t OperationCheck_Left;
 motionmanager::MovementsData_t RocketPunch;
+motionmanager::MovementsData_t Empty;
 void setup() {}
 }  // namespace motion_datas

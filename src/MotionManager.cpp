@@ -25,14 +25,19 @@ void MotionManager::update(AngleDatas_t angle_datas) {
     }
 
     if (Shoulder.isFreeToMove() && UpperArm.isFreeToMove()) {
-      Shoulder.reset();
-      UpperArm.reset();
       if (HasElbow && Elbow.isFreeToMove()) {
+        Shoulder.reset();
+        UpperArm.reset();
         Elbow.reset();
+        MovementInProgress = false;
+      } else {
+        Shoulder.reset();
+        UpperArm.reset();
+        MovementInProgress = false;
       }
     }
 
-  } else if (MovementInProgress) {
+  } else if (!MovementInProgress) {
     Shoulder.reset();
     Elbow.reset();
     if (HasElbow) {
@@ -42,8 +47,9 @@ void MotionManager::update(AngleDatas_t angle_datas) {
 }
 
 void MotionManager::StartMove(MovementsData_t movement_datas) {
-  MovementsData = movement_datas;
+  if (MovementInProgress) return;
   MovementInProgress = true;
+  MovementsData = movement_datas;
   Shoulder.loadMove(MovementsData.Shoulder);
   Shoulder.startMovement();
 
