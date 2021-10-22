@@ -49,7 +49,6 @@ double ShoulderManipulateValue = 0, UpperArmManipulateValue = 0,
 const int ElbowMotorPower = 150;
 
 bool ElbowRoriconInitialised = false;
-bool SwordDrawInProgress = false, SwordDrawCompleted = false;
 
 //
 PID4Arduino::PID4arduino<int> ElbowPID;
@@ -79,9 +78,6 @@ void Update4RightArmReset(double *ShoulderManipulateValue,
                           double *UpperArmManipulateValue,
                           double *ElbowManipulateValue);
 
-void SwordDrawingProcedure(double *ShoulderManipulateValue,
-                           double *UpperArmManipulateValue,
-                           double *ElbowManipulateValue);
 void PrintVariousThings();
 
 void setup() {
@@ -132,11 +128,10 @@ void setup() {
   ElbowRoricon->setup(0b1100);
   attachInterrupt(Pinmap.ElbowRoricon[0], ElbowRoriconInterrupter, RISING);
   attachInterrupt(Pinmap.ElbowRoricon[1], ElbowRoriconInterrupter, RISING);
+  Serial.println("Setup End");
 }
 
 void loop() {
-  Serial.println("update");
-
   for (int i = 0; i < 2; i++) {
     SensorStates.ElbowLimit[i] = !digitalRead(Pinmap.ElbowLimit[i]);
   }
@@ -157,10 +152,13 @@ void loop() {
       kodaioh_shoulder::SensorStates.UpperArmRotationRad * RAD_TO_DEG;
   AngleDatas.ElbowRotationDeg = SensorStates.ElbowRotationRad * RAD_TO_DEG;
 
+  Serial.println("Motion Update");
   Motion.update(AngleDatas);
+  Serial.println("Motion Update Called");
+
   //
 
-  kodaioh_shoulder::update();
+  // kodaioh_shoulder::update();
 
   // Sticks.SendData2Robot(BothHandsData);
 
@@ -180,52 +178,51 @@ void loop() {
 
     kodaioh_shoulder::UpdateWhenDirty(ShoulderManipulateValue,
                                       UpperArmManipulateValue);
-    PrintVariousThings();
+    // PrintVariousThings();
     kodaioh_shoulder::IsDirty = false;
 
+#ifndef Debug
     Serial.println("Right Hands Received Data:");
     Sticks.DumpData(BothHandsData.RightStick);
     Serial.println("Left Hands Received Data:");
     Sticks.DumpData(BothHandsData.LeftStick);
+#endif
   }
 
-  ElbowPID.update(ElbowTargetDeg, SensorStates.ElbowRotationRad);
+  // ElbowPID.update(ElbowTargetDeg, SensorStates.ElbowRotationRad);
 
-  delay(100);
+  // delay(100);
 }
 
 void RightArmUpdate() {
-  if ((BothHandsData.RightStick.ButtonState[4] && !SwordDrawCompleted) ||
-      SwordDrawInProgress)
-    SwordDrawingProcedure(&ShoulderManipulateValue, &UpperArmManipulateValue,
-                          &ElbowManipulateValue);
-
   Serial.println("right arm update");
 
 #ifdef Debug
-  UpdateTestDummy(&ShoulderManipulateValue, &UpperArmManipulateValue,
-                  &ElbowManipulateValue);
+  // UpdateTestDummy(&ShoulderManipulateValue, &UpperArmManipulateValue,
+  //                 &ElbowManipulateValue);
+  UpdateTaishinMethod(&ShoulderManipulateValue, &UpperArmManipulateValue,
+                      &ElbowManipulateValue);
 #else
   UpdateAKIRAMethod(&ShoulderManipulateValue, &UpperArmManipulateValue);
 #endif
 
-  if (ElbowManipulateValue > 0) {
-    if (!SensorStates.ElbowLimit[0]) {
-      analogWrite(Pinmap.ElbowMotors[0], ElbowManipulateValue);
-      analogWrite(Pinmap.ElbowMotors[1], 0);
-    } else {
-      analogWrite(Pinmap.ElbowMotors[0], 0);
-      analogWrite(Pinmap.ElbowMotors[1], 0);
-    }
-  } else {
-    if (!SensorStates.ElbowLimit[1]) {
-      analogWrite(Pinmap.ElbowMotors[0], 0);
-      analogWrite(Pinmap.ElbowMotors[1], ElbowManipulateValue);
-    } else {
-      analogWrite(Pinmap.ElbowMotors[0], 0);
-      analogWrite(Pinmap.ElbowMotors[1], 0);
-    }
-  }
+  // if (ElbowManipulateValue > 0) {
+  //   if (!SensorStates.ElbowLimit[0]) {
+  //     analogWrite(Pinmap.ElbowMotors[0], ElbowManipulateValue);
+  //     analogWrite(Pinmap.ElbowMotors[1], 0);
+  //   } else {
+  //     analogWrite(Pinmap.ElbowMotors[0], 0);
+  //     analogWrite(Pinmap.ElbowMotors[1], 0);
+  //   }
+  // } else {
+  //   if (!SensorStates.ElbowLimit[1]) {
+  //     analogWrite(Pinmap.ElbowMotors[0], 0);
+  //     analogWrite(Pinmap.ElbowMotors[1], ElbowManipulateValue);
+  //   } else {
+  //     analogWrite(Pinmap.ElbowMotors[0], 0);
+  //     analogWrite(Pinmap.ElbowMotors[1], 0);
+  //   }
+  // }
 }
 
 void LeftArmUpdate() {
@@ -289,6 +286,15 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue,
                          double *ElbowManipulateValue) {
+#ifdef Debug
+  Serial.println("Update Taishin Method!");
+  if (!Motion.IsBusy()) {
+    Serial.println("Motion Startmove: Empty");
+    Motion.StartMove(motion_datas::Empty);
+  }
+  kodaioh_shoulder::IsDirty = true;
+#else
+
   if (!Motion.IsBusy()) {
     if (BothHandsData.RightStick.ButtonState[0])
       Motion.StartMove(motion_datas::Empty);
@@ -312,6 +318,8 @@ void UpdateTaishinMethod(double *ShoulderManipulateValue,
     if (BothHandsData.LeftStick.ButtonState[4])
       Motion.StartMove(motion_datas::Empty);
   }
+#endif
+
   kodaioh_shoulder::UpdateTaishinMethod(ShoulderManipulateValue,
                                         UpperArmManipulateValue);
   *ElbowManipulateValue = ElbowPID.GetValue();
@@ -324,14 +332,6 @@ void Update4RightArmReset(double *ShoulderManipulateValue,
   if (ElbowRoriconInitialised) {
     *ElbowManipulateValue = -ElbowMotorPower;
   }
-}
-
-void SwordDrawingProcedure(double *ShoulderManipulateValue,
-                           double *UpperArmManipulateValue,
-                           double *ElbowManipulateValue) {
-  ///このモーターをこのくらい動かし、そのモーターをあのくらい動かし、
-  Update4RightArmReset(ShoulderManipulateValue, UpperArmManipulateValue,
-                       ElbowManipulateValue);
 }
 
 void PrintVariousThings() {

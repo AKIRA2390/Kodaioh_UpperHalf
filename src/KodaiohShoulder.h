@@ -50,7 +50,7 @@ extern const double UpperArmLimitAngleRad[2];
 extern AMT102V *ShoulderRoricon, *UpperArmRoricon;
 
 //
-extern PID4Arduino::PID4arduino<int> *ShoulderPID, *UpperArmPID;
+extern PID4Arduino::PID4arduino<int> ShoulderPID, UpperArmPID;
 extern PID4Arduino::PIDGain_t ShoulderPIDGains, UpperArmPIDGains;
 
 extern int ShoulderTargetDeg, UpperArmTargetDeg;

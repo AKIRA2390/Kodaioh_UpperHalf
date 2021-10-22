@@ -26,7 +26,7 @@ class AxialMovement {
   AxialMovement();
   ~AxialMovement();
 
-  void update(double rotation_deg, int *shoulder_target_deg);
+  void update(double rotation_deg, int *target_deg);
 
   void loadMove(std::vector<Movement_t> movement_data);
   void startMovement();

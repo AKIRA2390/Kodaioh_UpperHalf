@@ -35,7 +35,7 @@ void ShoulderRoriconInterrupter() { ShoulderRoricon->update(); }
 void UpperArmRoriconInterrupter() { UpperArmRoricon->update(); }
 
 //
-PID4Arduino::PID4arduino<int> *ShoulderPID, *UpperArmPID;
+PID4Arduino::PID4arduino<int> ShoulderPID, UpperArmPID;
 PID4Arduino::PIDGain_t ShoulderPIDGains = {}, UpperArmPIDGains = {};
 
 int ShoulderTargetDeg = 0, UpperArmTargetDeg = 0;
@@ -112,8 +112,8 @@ void setup(controlstick::ControlStick *stick,
                   RISING);
 
   //
-  ShoulderPID->setGains(ShoulderPIDGains);
-  UpperArmPID->setGains(UpperArmPIDGains);
+  ShoulderPID.setGains(ShoulderPIDGains);
+  UpperArmPID.setGains(UpperArmPIDGains);
   //
 }
 
@@ -123,9 +123,6 @@ void update() {
     SensorStates.UpperArmLimit[i] = !digitalRead(Pinmap.UpperArmLimit[i]);
   }
 
-#ifdef Debug
-  SensorStates.ShoulderLimit = true;
-#endif
   if (SensorStates.ShoulderLimit) {
     ShoulderRoriconInitialised = true;
     ShoulderRoricon->resetRotation();
@@ -158,12 +155,10 @@ void update() {
       ShoulderRoricon->getRotationsDouble();
   SensorStates.UpperArmRoriconRotationPrev =
       UpperArmRoricon->getRotationsDouble();
-#ifdef Debug
-#endif
 
   //
-  ShoulderPID->update(ShoulderTargetDeg, SensorStates.ShoulderRotationRad);
-  UpperArmPID->update(UpperArmTargetDeg, SensorStates.UpperArmRotationRad);
+  // ShoulderPID.update(ShoulderTargetDeg, SensorStates.ShoulderRotationRad);
+  // UpperArmPID.update(UpperArmTargetDeg, SensorStates.UpperArmRotationRad);
   //
 }
 
@@ -317,8 +312,8 @@ void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue) {
   // ShoulderTargetDeg = 20;
 
-  *ShoulderManipulateValue = ShoulderPID->GetValue();
-  *UpperArmManipulateValue = UpperArmPID->GetValue();
+  *ShoulderManipulateValue = ShoulderPID.GetValue();
+  *UpperArmManipulateValue = UpperArmPID.GetValue();
 }
 
 void Update4ShoulderUnitReset(double *ShoulderManipulateValue,
