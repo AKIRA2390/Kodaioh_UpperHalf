@@ -18,13 +18,7 @@ void AxialMovement::update(double rotation_deg, int *target_deg) {
     return;
   }
 
-  Serial.print("clock \t");
-  Serial.println(millis());
-  Serial.print("base time \t");
-  Serial.println(int(BaseTime));
   int internalClock = (millis() - BaseTime);
-  Serial.print("internal clock \t");
-  Serial.println(internalClock);
 
   if (internalClock > DulationTimeAll) {
     Serial.print("Dulation Time All:\t");
@@ -36,24 +30,21 @@ void AxialMovement::update(double rotation_deg, int *target_deg) {
   }
   setAsMoving();
 
-  Serial.println("hi!");
-  while (internalClock >= DulationTimeTemp) {
-    Serial.print("duration time temp");
-    Serial.println(DulationTimeTemp);
+  if (internalClock > DulationTimeTemp) {
+    Serial.println("\n\n\n///////////////////////////////////////\n\n\n");
+    MovementStepNow++;
     Movement_t tempMovement = MovementTasks.at(MovementStepNow);
     DulationTimeTemp += tempMovement.MovementDulationTime;
-    MovementStepNow++;
   }
 
   Serial.print("movement tasks size: \t");
   Serial.println(MovementTasks.size());
   Serial.print("movement step now: \t");
   Serial.println(MovementStepNow);
-    Serial.println("hello!");
+
   int MSD = MovementTasks.at(MovementStepNow).MovementStartDeg,
       MTD = MovementTasks.at(MovementStepNow).MovementTargetDeg,
       DT = MovementTasks.at(MovementStepNow).MovementDulationTime;
-    Serial.println("world!");
 
   DeltaTargetDeg =
       (double(MTD) - double(MSD)) / double(DT) * double(internalClock);
@@ -75,10 +66,12 @@ void AxialMovement::update(double rotation_deg, int *target_deg) {
 void AxialMovement::loadMove(std::vector<Movement_t> movement_data) {
   Serial.println("\n Loading Move!");
   MovementTasks = movement_data;
-  Serial.print("hoge");
+
   for (int i = 0; i < movement_data.size(); i++) {
-    Serial.println((movement_data.at(i)).MovementDulationTime);
     DulationTimeAll += (movement_data.at(i)).MovementDulationTime;
+  }
+  if (movement_data.size()) {
+    DulationTimeTemp += movement_data.at(1).MovementDulationTime;
   }
 }
 
