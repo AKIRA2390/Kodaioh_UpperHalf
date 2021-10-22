@@ -64,8 +64,15 @@ void MotionManager::StartMove(MovementsData_t movement_datas) {
 bool MotionManager::IsBusy() { return MovementInProgress; }
 
 void addMove(std::vector<axialmovement::Movement_t> &movement_data,
-             axialmovement::Movement_t move) {
-  movement_data.push_back(move);  //アヤシイ...動かなさそうな気がする
+             int movement_start_deg, int movement_target_deg,
+             int movement_dulation_time) {
+  axialmovement::Movement_t Move;
+  
+  Move.MovementStartDeg = movement_start_deg;
+  Move.MovementTargetDeg = movement_target_deg;
+  Move.MovementDulationTime = movement_dulation_time;
+
+  movement_data.push_back(Move);  //アヤシイ...動かなさそうな気がする
 }
 }  // namespace motionmanager
 

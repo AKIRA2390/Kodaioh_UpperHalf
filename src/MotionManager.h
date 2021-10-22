@@ -34,5 +34,6 @@ class MotionManager {
 };
 
 void addMove(std::vector<axialmovement::Movement_t> &movement_data,
-             axialmovement::Movement_t move);
+             int movement_start_deg, int movement_target_deg,
+             int movement_dulation_time);
 }  // namespace motionmanager

@@ -52,7 +52,7 @@ bool ElbowRoriconInitialised = false;
 bool SwordDrawInProgress = false, SwordDrawCompleted = false;
 
 //
-extern PID4Arduino::PID4arduino<int> ElbowPID;
+PID4Arduino::PID4arduino<int> ElbowPID;
 PID4Arduino::PIDGain_t ShoulderPIDGain, UpperArmPIDGain, ElbowPIDGain;
 
 int ElbowTargetDeg = 0;
