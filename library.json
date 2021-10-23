@@ -1,27 +1,27 @@
 {
-    "name": "KodaiohShoulder",
-    "version": "4.4.12",
-    "description": "codes to use Kohdaioh Shoulder",
-    "keywords": "Kohdaioh, esp32, esp-now",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/AKIRA2390/Kodaioh_UpperHalf"
+    "name":"KodaiohShoulder",
+    "version":"4.4.13",
+    "description":"codes to use Kohdaioh Shoulder",
+    "keywords":"Kohdaioh, esp32, esp-now",
+    "repository":{
+        "type":"git",
+        "url":"https://github.com/AKIRA2390/Kodaioh_UpperHalf"
     },
-    "authors": [
+    "authors":[
         {
-            "name": "akira2390"
+            "name":"akira2390"
         }
     ],
-    "dependencies": {
-        "AMR102V": "https://github.com/AKIRA2390/AMT102V",
-        "ControlStick": "https://github.com/AKIRA2390/TheRobot_ControlStick#branch",
-        "ESP32Servo": "*",
-        "PID4arduino": "https://github.com/AKIRA2390/PID4arduino"
+    "dependencies":{
+        "AMR102V":"https://github.com/AKIRA2390/AMT102V",
+        "ControlStick":"https://github.com/AKIRA2390/TheRobot_ControlStick#branch",
+        "ESP32Servo":"*",
+        "PID4arduino":"https://github.com/AKIRA2390/PID4arduino"
     },
-    "frameworks": "*",
-    "platforms": "*",
-    "export": {
-        "include": [
+    "frameworks":"*",
+    "platforms":"*",
+    "export":{
+        "include":[
             "library.json",
             "src/KodaiohShoulder.*",
             "src/MotionManager.*",

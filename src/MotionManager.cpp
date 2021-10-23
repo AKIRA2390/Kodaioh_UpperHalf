@@ -12,6 +12,9 @@ MotionManager::MotionManager(bool hasElbow) : HasElbow(hasElbow){};
 
 void MotionManager::setup(int *shoulder_TD, int *upper_arm_TD, int *elbow_TD) {
   // Serial.println("\nMotion Setup");
+  Shoulder.setDebug(true);
+  // UpperArm.setDebug(true);
+  // Elbow.setDebug(true);
 
   ShoulderTD = shoulder_TD;
   UpperArmTD = upper_arm_TD;

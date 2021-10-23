@@ -7,6 +7,7 @@
 namespace axialmovement {
 AxialMovement::AxialMovement() {}
 AxialMovement::~AxialMovement() {}
+void AxialMovement::setDebug(bool value) { Debug = value; }
 
 void AxialMovement::update(double rotation_deg, int *target_deg) {
 #ifdef DebugAxialMovement
@@ -43,36 +44,38 @@ void AxialMovement::update(double rotation_deg, int *target_deg) {
 
   *target_deg = DeltaTargetDeg;
 #ifdef DebugAxialMovement
-  // Serial.println("Debug Axial Movement!");
-  // Serial.print("movement_tasks_size:");
-  // Serial.print(MovementTasks.size());
-  // Serial.print(", ");
-  // Serial.print("movement_step_now:");
-  // Serial.print(MovementStepNow);
-  // Serial.print(", ");
-  Serial.print("movement_start_deg:");
-  Serial.print(MSD);
-  Serial.print(", ");
-  Serial.print("movement_target_deg:");
-  Serial.print(MTD);
-  Serial.print(", ");
-  // Serial.print("delta_time:");
-  // Serial.print(DeltaTime);
-  // Serial.print(", ");
-  // Serial.print("movement_duration_time_temp:");
-  // Serial.print(DulationTimeTemp);
-  // Serial.print(", ");
-  // Serial.print("internal_clock:");
-  // Serial.print(internalClock);
-  // Serial.print(", ");
-  Serial.print("Delta_Target_Deg:");
-  Serial.println(DeltaTargetDeg);
-  Serial.println("\n");
+  if (Debug) {
+    // Serial.println("Debug Axial Movement!");
+    // Serial.print("movement_tasks_size:");
+    // Serial.print(MovementTasks.size());
+    // Serial.print(", ");
+    // Serial.print("movement_step_now:");
+    // Serial.print(MovementStepNow);
+    // Serial.print(", ");
+    Serial.print("movement_start_deg:");
+    Serial.print(MSD);
+    Serial.print(", ");
+    Serial.print("movement_target_deg:");
+    Serial.print(MTD);
+    Serial.print(", ");
+    // Serial.print("delta_time:");
+    // Serial.print(DeltaTime);
+    // Serial.print(", ");
+    // Serial.print("movement_duration_time_temp:");
+    // Serial.print(DulationTimeTemp);
+    // Serial.print(", ");
+    // Serial.print("internal_clock:");
+    // Serial.print(internalClock);
+    // Serial.print(", ");
+    Serial.print("Delta_Target_Deg:");
+    Serial.println(DeltaTargetDeg);
+    // Serial.println("\n");
+  }
 #endif
 }
 
 void AxialMovement::loadMove(std::vector<Movement_t> movement_data) {
-  Serial.println("\n Loading Move!");
+  // Serial.println("\n Loading Move!");
   MovementTasks = movement_data;
 
   for (int i = 0; i < movement_data.size(); i++) {

@@ -15,7 +15,7 @@ class AxialMovement {
   int NowTargetDeg = 0, DeltaTargetDeg = 0, MovementStepNow = 0;
   double DulationTimeAll = 0, DulationTimeTemp = 0;
   uint64_t BaseTime = 0;
-  bool isMoving = false;
+  bool isMoving = false, Debug = false;
 
   std::vector<Movement_t> MovementTasks;
 
@@ -25,6 +25,8 @@ class AxialMovement {
  public:
   AxialMovement();
   ~AxialMovement();
+
+  void setDebug(bool value);
 
   void update(double rotation_deg, int *target_deg);
 

@@ -90,20 +90,20 @@ void setup() {
       kodaioh_shoulder::ShoulderMotorPower /
       (abs(kodaioh_shoulder::ShoulderLimitAngleRad[0] * RAD_TO_DEG) +
        abs(kodaioh_shoulder::ShoulderLimitAngleRad[1] * RAD_TO_DEG));
-  ShoulderPIDGain.KI = 30;
-  ShoulderPIDGain.KD = 30;
+  ShoulderPIDGain.KI = 0;
+  ShoulderPIDGain.KD = 0;
 
   UpperArmPIDGain.KP =
       kodaioh_shoulder::UpperArmMotorPower /
       (abs(kodaioh_shoulder::UpperArmLimitAngleRad[0] * RAD_TO_DEG) +
        abs(kodaioh_shoulder::UpperArmLimitAngleRad[1] * RAD_TO_DEG));
-  UpperArmPIDGain.KI = 30;
-  UpperArmPIDGain.KD = 30;
+  UpperArmPIDGain.KI = 0;
+  UpperArmPIDGain.KD = 0;
 
   ElbowPIDGain.KP = ElbowMotorPower / (abs(ElbowLimitAngleRad[0] * RAD_TO_DEG) +
                                        abs(ElbowLimitAngleRad[1] * RAD_TO_DEG));
-  ElbowPIDGain.KI = 30;
-  ElbowPIDGain.KD = 30;
+  ElbowPIDGain.KI = 0;
+  ElbowPIDGain.KD = 0;
 
   motion_datas::setup();
 
@@ -158,7 +158,7 @@ void loop() {
 
   //
 
-  // kodaioh_shoulder::update();
+  kodaioh_shoulder::update();
 
   // Sticks.SendData2Robot(BothHandsData);
 
@@ -178,7 +178,7 @@ void loop() {
 
     kodaioh_shoulder::UpdateWhenDirty(ShoulderManipulateValue,
                                       UpperArmManipulateValue);
-    // PrintVariousThings();
+    PrintVariousThings();
     kodaioh_shoulder::IsDirty = false;
 
 #ifndef Debug
@@ -189,7 +189,7 @@ void loop() {
 #endif
   }
 
-  // ElbowPID.update(ElbowTargetDeg, SensorStates.ElbowRotationRad);
+  ElbowPID.update(ElbowTargetDeg, SensorStates.ElbowRotationRad);
 
   // delay(100);
 }
@@ -198,10 +198,10 @@ void RightArmUpdate() {
   // Serial.println("right arm update");
 
 #ifdef Debug
-  // UpdateTestDummy(&ShoulderManipulateValue, &UpperArmManipulateValue,
-  //                 &ElbowManipulateValue);
-  UpdateTaishinMethod(&ShoulderManipulateValue, &UpperArmManipulateValue,
-                      &ElbowManipulateValue);
+  UpdateTestDummy(&ShoulderManipulateValue, &UpperArmManipulateValue,
+                  &ElbowManipulateValue);
+//   UpdateTaishinMethod(&ShoulderManipulateValue, &UpperArmManipulateValue,
+//                       &ElbowManipulateValue);
 #else
   UpdateAKIRAMethod(&ShoulderManipulateValue, &UpperArmManipulateValue);
 #endif
@@ -232,7 +232,7 @@ void LeftArmUpdate() {
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue,
                      double *ElbowManipulateValue) {
-  const bool ShoulderTesting = false, UpperArmTesting = true,
+  const bool ShoulderTesting = true, UpperArmTesting = false,
              ElbowTesting = false;
   static bool ElbowDirection = true;
 
@@ -289,7 +289,7 @@ void UpdateTaishinMethod(double *ShoulderManipulateValue,
 #ifdef Debug
   // Serial.println("Update Taishin Method!");
   if (!Motion.IsBusy()) {
-    // Serial.println("Motion Startmove: Empty");
+    // Serial.println("Motion Startmove:Empty");
     Motion.StartMove(motion_datas::Empty);
   }
   kodaioh_shoulder::IsDirty = true;
@@ -336,82 +336,97 @@ void Update4RightArmReset(double *ShoulderManipulateValue,
 }
 
 void PrintVariousThings() {
-  // Serial.println("\n");
-  // Serial.print("Shoulder Roricon Raw:\t\t");
-  // Serial.println(kodaioh_shoulder::ShoulderRoricon->getRotationsDouble());
-  Serial.print("Shoulder roricon initialized:\t");
-  Serial.println(kodaioh_shoulder::ShoulderRoriconInitialised ? "true"
-                                                              : "false");
-  Serial.print("Shoulder Manipulate Value:\t");
-  Serial.println(ShoulderManipulateValue);
-  Serial.print("Shoulder Angle Deg:\t\t");
-  Serial.println(kodaioh_shoulder::SensorStates.ShoulderRotationRad *
-                 RAD_TO_DEG);
-  // Serial.print("Shoulder Limit Angle Deg:\t");
+  // Serial.print("\n");
+  // Serial.print("Shoulder Roricon Raw:");
+  // Serial.print(kodaioh_shoulder::ShoulderRoricon->getRotationsDouble());
+  // Serial.print("Shoulder roricon initialized:");
+  // Serial.print(kodaioh_shoulder::ShoulderRoriconInitialised ? "true" : "false");
+  // Serial.print(", ");
+  // Serial.print("Shoulder Manipulate Value:");
+  // Serial.print(ShoulderManipulateValue);
+  // Serial.print(", ");
+  Serial.print("Shoulder_Angle_Deg:");
+  Serial.print(kodaioh_shoulder::SensorStates.ShoulderRotationRad * RAD_TO_DEG);
+  Serial.print(", ");
+  // Serial.print("Shoulder Limit Angle Deg:");
   // Serial.print(kodaioh_shoulder::ShoulderLimitAngleRad[0] * RAD_TO_DEG);
-  // Serial.print("\t");
-  // Serial.println(kodaioh_shoulder::ShoulderLimitAngleRad[1] * RAD_TO_DEG);
-  Serial.print("Shoulder Limit Stats:\t");
-  Serial.print(kodaioh_shoulder::SensorStates.ShoulderLimit);
-  // Serial.print("Shoulder Error Value:\t\t");
+  // Serial.print(":");
+  // Serial.print(kodaioh_shoulder::ShoulderLimitAngleRad[1] * RAD_TO_DEG);
+  // Serial.print(", ");
+  // Serial.print("Shoulder Limit Stats:");
+  // Serial.print(kodaioh_shoulder::SensorStates.ShoulderLimit);
+  // Serial.print("Shoulder Error Value:");
   // Serial.print((kodaioh_shoulder::ShoulderLimitAngleRad[0] -
   //               kodaioh_shoulder::SensorStates.ShoulderRotationRad) *
   //              RAD_TO_DEG);
-  // Serial.print("\t");
+  // Serial.print(":");
   // Serial.print(kodaioh_shoulder::MotorPower *
   //              ((kodaioh_shoulder::ShoulderLimitAngleRad[0] -
   //                kodaioh_shoulder::SensorStates.ShoulderRotationRad) /
   //               kodaioh_shoulder::ShoulderLimitAngleRad[0]));
-  Serial.println("\n");
+  // Serial.print("\n");
+  // Serial.print(", ");
 
-  // Serial.print("UpperArm Roricon Raw:\t\t");
-  // Serial.println(kodaioh_shoulder::UpperArmRoricon->getRotationsDouble());
-  Serial.print("UpperArm roricon initialized:\t");
-  Serial.println(kodaioh_shoulder::UpperArmRoriconInitialised ? "true"
-                                                              : "false");
-  Serial.print("UpperArm Manipulate Value:\t");
-  Serial.println(UpperArmManipulateValue);
-  Serial.print("UpperArm Angle Deg:\t\t");
-  Serial.println(kodaioh_shoulder::SensorStates.UpperArmRotationRad *
-                 RAD_TO_DEG);
-  // Serial.print("UpperArm Limit Angle Deg:\t");
+  // Serial.print("UpperArm Roricon Raw:");
+  // Serial.print(kodaioh_shoulder::UpperArmRoricon->getRotationsDouble());
+  // Serial.print(", ");
+  // Serial.print("UpperArm roricon initialized:");
+  // Serial.print(kodaioh_shoulder::UpperArmRoriconInitialised ? "true" : "false");
+  // Serial.print(", ");
+  // Serial.print("UpperArm Manipulate Value:");
+  // Serial.print(UpperArmManipulateValue);
+  // Serial.print(", ");
+  // Serial.print("UpperArm Angle Deg:");
+  // Serial.print(kodaioh_shoulder::SensorStates.UpperArmRotationRad * RAD_TO_DEG);
+  // Serial.print(", ");
+  // Serial.print("UpperArm Limit Angle Deg:");
   // Serial.print(kodaioh_shoulder::UpperArmLimitAngleRad[0]*RAD_TO_DEG);
-  // Serial.print("\t");
-  // Serial.println(kodaioh_shoulder::UpperArmLimitAngleRad[1]*RAD_TO_DEG);
+  // Serial.print(":");
+  // Serial.print(kodaioh_shoulder::UpperArmLimitAngleRad[1]*RAD_TO_DEG);
+  // Serial.print(", ");
 
-  Serial.print("UpperArm Limit Stats:\t");
-  Serial.print(kodaioh_shoulder::SensorStates.UpperArmLimit[0]);
-  Serial.print("\t");
-  Serial.println(kodaioh_shoulder::SensorStates.UpperArmLimit[1]);
-  // Serial.print("UpperArm Error Value:\t\t");
+  // Serial.print("UpperArm Limit Stats:");
+  // Serial.print(kodaioh_shoulder::SensorStates.UpperArmLimit[0]);
+  // Serial.print(":");
+  // Serial.print(kodaioh_shoulder::SensorStates.UpperArmLimit[1]);
+  // Serial.print(", ");
+  // Serial.print("UpperArm Error Value:");
   // Serial.print((kodaioh_shoulder::UpperArmLimitAngleRad[0] -
   // kodaioh_shoulder::SensorStates.UpperArmRotationRad)*RAD_TO_DEG);
-  // Serial.print("\t");
+  // Serial.print(":");
   // Serial.print(kodaioh_shoulder::MotorPower*((kodaioh_shoulder::UpperArmLimitAngleRad[0]
   // -
   // kodaioh_shoulder::SensorStates.UpperArmRotationRad)/kodaioh_shoulder::UpperArmLimitAngleRad[0]));
-  Serial.println("\n");
+  // Serial.print("\n");
+  // Serial.print(", ");
 
-  Serial.print("Elbow Roricon Initialized:\t");
-  Serial.println(ElbowRoriconInitialised ? "true" : "false");
-  // Serial.print("Elbow Roricon Raw:\t\t");
-  // Serial.println(ElbowRoricon->getRotationsDouble());
-  Serial.print("Elbow Manipulate Value:\t\t");
-  Serial.println(ElbowManipulateValue);
-  Serial.print("Elbow Angle Deg:\t\t");
-  Serial.println(SensorStates.ElbowRotationRad * RAD_TO_DEG);
-  // Serial.print("Elbow Limit max\t\t");
-  // Serial.println(SensorStates.ElbowLimit[0]);
-  // Serial.print("Elbow Limit min\t\t");
-  // Serial.println(SensorStates.ElbowLimit[1]);
-  // Serial.print("Elbow Limit Angle Deg:\t\t");
+  // Serial.print("Elbow Roricon Initialized:");
+  // Serial.print(ElbowRoriconInitialised ? "true" : "false");
+  // Serial.print(", ");
+  // Serial.print("Elbow Roricon Raw:");
+  // Serial.print(ElbowRoricon->getRotationsDouble());
+  // Serial.print(", ");
+  // Serial.print("Elbow Manipulate Value:");
+  // Serial.print(ElbowManipulateValue);
+  // Serial.print(", ");
+  // Serial.print("Elbow Angle Deg:");
+  // Serial.print(SensorStates.ElbowRotationRad * RAD_TO_DEG);
+  // Serial.print(", ");
+  // Serial.print("Elbow Limit max:");
+  // Serial.print(SensorStates.ElbowLimit[0]);
+  // Serial.print(", ");
+  // Serial.print("Elbow Limit min:");
+  // Serial.print(SensorStates.ElbowLimit[1]);
+  // Serial.print(", ");
+  // Serial.print("Elbow Limit Angle Deg:");
   // Serial.print(ElbowLimitAngleRad[0]*RAD_TO_DEG);
-  // Serial.print("\t");
-  // Serial.println(ElbowLimitAngleRad[1]*RAD_TO_DEG);
-  // Serial.print("Elbow Error Value:\t\t");
+  // Serial.print(":");
+  // Serial.print(ElbowLimitAngleRad[1]*RAD_TO_DEG);
+  // Serial.print(", ");
+  // Serial.print("Elbow Error Value:");
   // Serial.print((ElbowLimitAngleRad[0] -
-  // SensorStates.ElbowRotationRad)*RAD_TO_DEG); Serial.print("\t");
+  // SensorStates.ElbowRotationRad)*RAD_TO_DEG); Serial.print(":");
   // Serial.print(kodaioh_shoulder::MotorPower*((ElbowLimitAngleRad[0] -
   // SensorStates.ElbowRotationRad)/ElbowLimitAngleRad[0]));
-  Serial.println("\n");
+  // Serial.println("\n");
 }

@@ -43,9 +43,9 @@ int ShoulderTargetDeg = 0, UpperArmTargetDeg = 0;
 
 void SendCB(const uint8_t *mac_addr, esp_now_send_status_t status) {
   // #ifdef Debug
-  //   Serial.print("\r\nLast Packet Send Status:\t");
+  //   Serial.print("\r\nLast Packet Send Status::");
   //   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success"
-  //                                                 : "Delivery Fail");
+  //                                                 :"Delivery Fail");
   // #endif
 }
 
@@ -56,10 +56,10 @@ void RecvCB(const uint8_t *mac, const uint8_t *incomingData, int len) {
   IsDirty = true;
   // #ifdef Debug
   // Serial.println("Data Received!");
-  // Serial.println("Right Hand\tRight Hand\tRight Hand\t");
+  // Serial.println("Right Hand:Right Hand:Right Hand:");
   // Stick->DumpData(((controlstick::BothHandsData_t
-  // *)incomingData)->RightStick); Serial.println("Left Hand\tLeft Hand\tLeft
-  // Hand\t"); Stick->DumpData(((controlstick::BothHandsData_t
+  // *)incomingData)->RightStick); Serial.println("Left Hand:Left Hand:Left
+  // Hand:"); Stick->DumpData(((controlstick::BothHandsData_t
   // *)incomingData)->LeftStick); Serial.println("\n"); #endif
 }
 
@@ -157,8 +157,8 @@ void update() {
       UpperArmRoricon->getRotationsDouble();
 
   //
-  // ShoulderPID.update(ShoulderTargetDeg, SensorStates.ShoulderRotationRad);
-  // UpperArmPID.update(UpperArmTargetDeg, SensorStates.UpperArmRotationRad);
+  ShoulderPID.update(ShoulderTargetDeg, SensorStates.ShoulderRotationRad);
+  UpperArmPID.update(UpperArmTargetDeg, SensorStates.UpperArmRotationRad);
   //
 }
 
@@ -167,62 +167,77 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
   if (!IsDirty) return;
 
   // UpdateAKIRAMethod(UpperArmManipulateValue, UpperArmManipulateValue);
-  // UpdateTaishinMethod(UpperArmManipulateValue, UpperArmManipulateValue);
+  UpdateTaishinMethod(&UpperArmManipulateValue, &UpperArmManipulateValue);
+
+  Serial.print("Shoulder_MV:");
+  Serial.print(ShoulderManipulateValue);
+  Serial.print(", ");
+  Serial.print("UpperArm_MV:");
+  Serial.print(UpperArmManipulateValue);
+  Serial.print(", ");
+
   if (ShoulderRoriconInitialised) {
     if (ShoulderManipulateValue >= 0) {
       if (SensorStates.ShoulderRotationRad < ShoulderLimitAngleRad[0]) {
-        // Serial.print("Shoulder Output Value\t");
-        // Serial.println(ShoulderManipulateValue);
+        Serial.print("Shoulder_OV:");
+        Serial.print(ShoulderManipulateValue);
+        Serial.print(", ");
 
         analogWrite(Pinmap.ShoulderMotors[0], abs(ShoulderManipulateValue));
-        analogWrite(Pinmap.ShoulderMotors[1], 0);
+        digitalWrite(Pinmap.ShoulderMotors[1], HIGH);
       } else {
-        // Serial.print("Shoulder Output Value\t");
-        // Serial.print(0);
-        // Serial.println("\tShoulder Max Limit");
+        Serial.print("Shoulder_OV:");
+        Serial.print(0);
+        Serial.print(", ");
+        // Serial.println("  Shoulder Max Limit");
 
         analogWrite(Pinmap.ShoulderMotors[0], 0);
         analogWrite(Pinmap.ShoulderMotors[1], 0);
       }
     } else if (ShoulderManipulateValue < 0) {
       if (ShoulderLimitAngleRad[1] < SensorStates.ShoulderRotationRad) {
-        // Serial.print("Shoulder Output Value\t");
-        // Serial.println(-ShoulderManipulateValue);
+        Serial.print("Shoulder_OV:");
+        Serial.println(-ShoulderManipulateValue);
+        Serial.print(", ");
 
-        analogWrite(Pinmap.ShoulderMotors[0], 0);
-        analogWrite(Pinmap.ShoulderMotors[1], abs(ShoulderManipulateValue));
-      } else {
-        // Serial.print("Shoulder Output Value\t");
-        // Serial.print(0);
-        // Serial.println("\tShoulder Min Limit");
+        analogWrite(Pinmap.ShoulderMotors[0], abs(ShoulderManipulateValue));
+        digitalWrite(Pinmap.ShoulderMotors[1], LOW);
+      } else
+        Serial.print("Shoulder_OV:");
+      Serial.print(0);
+      Serial.print(", ");
+      // Serial.println(":Shoulder Min Limit");
 
-        analogWrite(Pinmap.ShoulderMotors[0], 0);
-        analogWrite(Pinmap.ShoulderMotors[1], 0);
-      }
+      analogWrite(Pinmap.ShoulderMotors[0], 0);
+      analogWrite(Pinmap.ShoulderMotors[1], 0);
     }
+
   } else {
-    // Serial.print("Shoulder Output Value\t");
-    // Serial.print(0);
-    // Serial.println("\tShoulder Not Initialised");
+    Serial.print("Shoulder_OV:");
+    Serial.print(0);
+    Serial.print(", ");
+    // Serial.println(":Shoulder Not Initialised");
 
     analogWrite(Pinmap.ShoulderMotors[0], 0);
-    analogWrite(Pinmap.ShoulderMotors[1], 0);
+    analogWrite(Pinmap.ShoulderMotors[1], 1);
   }
 
   if (UpperArmRoriconInitialised) {
     if (UpperArmManipulateValue >= 0) {
       if (SensorStates.UpperArmLimit[0] ||
           SensorStates.UpperArmRotationRad > UpperArmLimitAngleRad[0]) {
-        // Serial.print("UpperArm Output Value\t");
-        // Serial.print(0);
-        // Serial.println("\tUpperArm Max Limit");
+        Serial.print("UpperArm_Output_Valu:");
+        Serial.print(0);
+        Serial.print(", ");
+        // Serial.println(":UpperArm Max Limit");
 
         analogWrite(Pinmap.UpperArmMotors[0], 0);
         analogWrite(Pinmap.UpperArmMotors[1], 0);
       } else {
-        // Serial.print("UpperArm Output Value\t");
-        // Serial.print(UpperArmManipulateValue);
-        // Serial.println("\tplus");
+        Serial.print("UpperArm_OV:");
+        Serial.print(UpperArmManipulateValue);
+        Serial.print(", ");
+        // Serial.println(":plus");
 
         analogWrite(Pinmap.UpperArmMotors[0], abs(UpperArmManipulateValue));
         analogWrite(Pinmap.UpperArmMotors[1], 0);
@@ -230,25 +245,26 @@ void UpdateWhenDirty(double ShoulderManipulateValue,
     } else if (UpperArmManipulateValue < 0) {
       if (SensorStates.UpperArmLimit[1] ||
           UpperArmLimitAngleRad[1] > SensorStates.UpperArmRotationRad) {
-        // Serial.print("UpperArm Output Value\t");
-        // Serial.println(0);
-        // Serial.println("\tUpperArm Min Limit");
-
+        Serial.print("UpperArm_OV:");
+        Serial.print(0);
+        Serial.print(", ");
+        // Serial.println(":UpperArm Min Limit");
         analogWrite(Pinmap.UpperArmMotors[0], 0);
         analogWrite(Pinmap.UpperArmMotors[1], 0);
       } else {
-        // Serial.print("UpperArm Output Value\t");
-        // Serial.print(-UpperArmManipulateValue);
-        // Serial.println("\tminus");
-
+        Serial.print("UpperArm_OV:");
+        Serial.print(-UpperArmManipulateValue);
+        Serial.print(", ");
+        // Serial.println(":minus");
         analogWrite(Pinmap.UpperArmMotors[0], 0);
         analogWrite(Pinmap.UpperArmMotors[1], abs(UpperArmManipulateValue));
       }
     }
   } else {
-    // Serial.print("UpperArm Output Value\t");
-    // Serial.println(0);
-    // Serial.println("\tUpperArm Not Initialised");
+    Serial.print("UpperArm_OV:");
+    Serial.print(0);
+    Serial.print(", ");
+    // Serial.println(":UpperArm Not Initialised");
 
     analogWrite(Pinmap.UpperArmMotors[0], 0);
     analogWrite(Pinmap.UpperArmMotors[1], 0);
@@ -299,7 +315,6 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
   //     /
   //      UpperArmLimitAngleRad[0]);
 }
-
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue) {
   *ShoulderManipulateValue =
