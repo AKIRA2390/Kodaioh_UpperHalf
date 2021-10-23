@@ -10,56 +10,64 @@ AxialMovement::~AxialMovement() {}
 
 void AxialMovement::update(double rotation_deg, int *target_deg) {
 #ifdef DebugAxialMovement
-  Serial.println("\nDebug Axial Movement!");
-  Serial.println("Update Called!");
+  // Serial.println("\nDebug Axial Movement!");
+  // Serial.println("Update Called!");
 #endif
   if (isFreeToMove()) {
-    Serial.println("Update Cancelled!");
+    // Serial.println("Update Cancelled!");
     return;
   }
 
   int internalClock = (millis() - BaseTime);
 
   if (internalClock > DulationTimeAll) {
-    Serial.print("Dulation Time All:\t");
-    Serial.println(DulationTimeAll);
     setAsNotMoving();
     this->reset();
-    Serial.println("Update timeout!");
+    // Serial.println("Update timeout!");
     return;
   }
   setAsMoving();
 
   if (internalClock > DulationTimeTemp) {
-    Serial.println("\n\n\n///////////////////////////////////////\n\n\n");
     MovementStepNow++;
     Movement_t tempMovement = MovementTasks.at(MovementStepNow);
     DulationTimeTemp += tempMovement.MovementDulationTime;
   }
 
-  Serial.print("movement tasks size: \t");
-  Serial.println(MovementTasks.size());
-  Serial.print("movement step now: \t");
-  Serial.println(MovementStepNow);
+  double MSD = MovementTasks.at(MovementStepNow).MovementStartDeg,
+         MTD = MovementTasks.at(MovementStepNow).MovementTargetDeg,
+         DT = MovementTasks.at(MovementStepNow).MovementDulationTime,
+         DeltaTime = DT - (DulationTimeTemp - internalClock);
 
-  int MSD = MovementTasks.at(MovementStepNow).MovementStartDeg,
-      MTD = MovementTasks.at(MovementStepNow).MovementTargetDeg,
-      DT = MovementTasks.at(MovementStepNow).MovementDulationTime;
-
-  DeltaTargetDeg =
-      (double(MTD) - double(MSD)) / double(DT) * double(internalClock);
+  DeltaTargetDeg = (MTD - MSD) / DT * DeltaTime + MSD;
 
   *target_deg = DeltaTargetDeg;
 #ifdef DebugAxialMovement
-  Serial.println("Debug Axial Movement!");
-  Serial.print("movement start deg:\t");
-  Serial.println(MSD);
-  Serial.print("movement target deg:\t");
-  Serial.println(MTD);
-  Serial.print("movement duration time:\t");
-  Serial.println(DT);
-  Serial.print("Delta Target Deg:\t");
+  // Serial.println("Debug Axial Movement!");
+  // Serial.print("movement_tasks_size:");
+  // Serial.print(MovementTasks.size());
+  // Serial.print(", ");
+  // Serial.print("movement_step_now:");
+  // Serial.print(MovementStepNow);
+  // Serial.print(", ");
+  Serial.print("movement_start_deg:");
+  Serial.print(MSD);
+  Serial.print(", ");
+  Serial.print("movement_target_deg:");
+  Serial.print(MTD);
+  Serial.print(", ");
+  // Serial.print("delta_time:");
+  // Serial.print(DeltaTime);
+  // Serial.print(", ");
+  // Serial.print("movement_duration_time_temp:");
+  // Serial.print(DulationTimeTemp);
+  // Serial.print(", ");
+  // Serial.print("internal_clock:");
+  // Serial.print(internalClock);
+  // Serial.print(", ");
+  Serial.print("Delta_Target_Deg:");
   Serial.println(DeltaTargetDeg);
+  Serial.println("\n");
 #endif
 }
 

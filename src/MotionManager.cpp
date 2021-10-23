@@ -11,7 +11,7 @@ namespace motionmanager {
 MotionManager::MotionManager(bool hasElbow) : HasElbow(hasElbow){};
 
 void MotionManager::setup(int *shoulder_TD, int *upper_arm_TD, int *elbow_TD) {
-  Serial.println("\nMotion Setup");
+  // Serial.println("\nMotion Setup");
 
   ShoulderTD = shoulder_TD;
   UpperArmTD = upper_arm_TD;
@@ -29,8 +29,8 @@ void MotionManager::update(AngleDatas_t angle_datas) {
     }
 
 #ifdef DebugMotionManager
-    Serial.println("\nDebug Motion Manager!");
-    Serial.println("Movement In Progress!");
+    // Serial.println("\nDebug Motion Manager!");
+    // Serial.println("Movement In Progress!");
 #endif
 
     if (Shoulder.isFreeToMove() && UpperArm.isFreeToMove()) {
@@ -48,11 +48,11 @@ void MotionManager::update(AngleDatas_t angle_datas) {
       Shoulder.reset();
     }
 #ifdef DebugMotionManager
-    Serial.println("\nDebug Motion Manager!");
-    Serial.println("Movement Not In Progress!");
+    // Serial.println("\nDebug Motion Manager!");
+    // Serial.println("Movement Not In Progress!");
 #endif
   } else {
-    Serial.println("Yo WTF");
+    // Serial.println("Yo WTF");
   }
 }
 

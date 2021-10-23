@@ -152,9 +152,9 @@ void loop() {
       kodaioh_shoulder::SensorStates.UpperArmRotationRad * RAD_TO_DEG;
   AngleDatas.ElbowRotationDeg = SensorStates.ElbowRotationRad * RAD_TO_DEG;
 
-  Serial.println("Motion Update");
+  // Serial.println("Motion Update");
   Motion.update(AngleDatas);
-  Serial.println("Motion Update Called");
+  // Serial.println("Motion Update Called");
 
   //
 
@@ -167,7 +167,7 @@ void loop() {
 #endif
 
   if (kodaioh_shoulder::IsDirty) {
-    Serial.println("is dirty");
+    // Serial.println("is dirty");
     kodaioh_shoulder::GetBothHandsData(&BothHandsData);
 
 #ifndef Debug
@@ -195,7 +195,7 @@ void loop() {
 }
 
 void RightArmUpdate() {
-  Serial.println("right arm update");
+  // Serial.println("right arm update");
 
 #ifdef Debug
   // UpdateTestDummy(&ShoulderManipulateValue, &UpperArmManipulateValue,
@@ -287,12 +287,13 @@ void UpdateTaishinMethod(double *ShoulderManipulateValue,
                          double *UpperArmManipulateValue,
                          double *ElbowManipulateValue) {
 #ifdef Debug
-  Serial.println("Update Taishin Method!");
+  // Serial.println("Update Taishin Method!");
   if (!Motion.IsBusy()) {
-    Serial.println("Motion Startmove: Empty");
+    // Serial.println("Motion Startmove: Empty");
     Motion.StartMove(motion_datas::Empty);
   }
   kodaioh_shoulder::IsDirty = true;
+  kodaioh_shoulder::SensorStates.ShoulderLimit = true;
 #else
 
   if (!Motion.IsBusy()) {
