@@ -79,8 +79,8 @@ void setup(controlstick::ControlStick *stick,
            bool UpperArmRoriconInvert = false);
 void update();
 
-void UpdateWhenDirty(double ShoulderManipulateValue,
-                     double UpperArmManipulateValue);
+// void UpdateWhenDirty(double ShoulderManipulateValue,
+//                      double UpperArmManipulateValue);
 
 void UpdateTestDummy(double *ShoulderManipulateValue,
                      double *UpperArmManipulateValue,

@@ -41,6 +41,8 @@ motionmanager::MotionManager Motion(true);
 motionmanager::AngleDatas_t AngleDatas;
 //
 
+HardwareSerial MySerial(2);
+
 // uint8_t LeftHalfAddress[] = {0xEC, 0x94, 0xCB, 0x6E, 0x29, 0x70};
 uint8_t LeftHalfAddress[] = {0x24, 0x0A, 0xC4, 0xF9, 0x40, 0xD0};
 
@@ -80,6 +82,9 @@ void Update4RightArmReset(double *ShoulderManipulateValue,
 
 void PrintVariousThings();
 
+void PWM_transmit_via_CAN(int16_t pwm1, int16_t pwm2, int16_t pwm3,
+                          int16_t pwm4);
+
 void setup() {
   Serial.begin(115200);
   // Sticks.ThisSends2Robot(LeftHalfAddress, );
@@ -100,12 +105,12 @@ void setup() {
   UpperArmPIDGain.KI = 0;
   UpperArmPIDGain.KD = 0;
 
-  ElbowPIDGain.KP = ElbowMotorPower / (abs(ElbowLimitAngleRad[0] *
-  RAD_TO_DEG) +
-                                       abs(ElbowLimitAngleRad[1] *
-                                       RAD_TO_DEG));
+  ElbowPIDGain.KP = ElbowMotorPower / (abs(ElbowLimitAngleRad[0] * RAD_TO_DEG) +
+                                       abs(ElbowLimitAngleRad[1] * RAD_TO_DEG));
   ElbowPIDGain.KI = 0;
   ElbowPIDGain.KD = 0;
+
+  MySerial.begin(115200, SERIAL_8N1, 17, 15);
 
   motion_datas::setup();
 
@@ -179,8 +184,14 @@ void loop() {
 
     LeftArmUpdate();
 
-    kodaioh_shoulder::UpdateWhenDirty(ShoulderManipulateValue,
-                                      UpperArmManipulateValue);
+    // kodaioh_shoulder::UpdateWhenDirty(ShoulderManipulateValue,
+    //                                   UpperArmManipulateValue);
+    const int SCALEFACTOR = 125;
+
+    PWM_transmit_via_CAN(ShoulderManipulateValue * SCALEFACTOR,
+                         UpperArmManipulateValue * SCALEFACTOR,
+                         ElbowManipulateValue * SCALEFACTOR, 0);
+
     PrintVariousThings();
     kodaioh_shoulder::IsDirty = false;
 
@@ -208,7 +219,6 @@ void RightArmUpdate() {
 #else
   UpdateAKIRAMethod(&ShoulderManipulateValue, &UpperArmManipulateValue);
 #endif
-
   // if (ElbowManipulateValue > 0) {
   //   if (!SensorStates.ElbowLimit[0]) {
   //     analogWrite(Pinmap.ElbowMotors[0], ElbowManipulateValue);
@@ -344,14 +354,14 @@ void PrintVariousThings() {
   // Serial.print(kodaioh_shoulder::ShoulderRoricon->getRotationsDouble());
   // Serial.print("Shoulder roricon initialized:");
   // Serial.print(kodaioh_shoulder::ShoulderRoriconInitialised ? "true" :
-  "false");
+  // "false");
   // Serial.print(", ");
   // Serial.print("Shoulder Manipulate Value:");
   // Serial.print(ShoulderManipulateValue);
   // Serial.print(", ");
   Serial.print("Shoulder_Angle_Deg:");
-  Serial.print(kodaioh_shoulder::SensorStates.ShoulderRotationRad *
-  RAD_TO_DEG); Serial.print(", ");
+  Serial.print(kodaioh_shoulder::SensorStates.ShoulderRotationRad * RAD_TO_DEG);
+  Serial.print(", ");
   // Serial.print("Shoulder Limit Angle Deg:");
   // Serial.print(kodaioh_shoulder::ShoulderLimitAngleRad[0] * RAD_TO_DEG);
   // Serial.print(":");
@@ -376,14 +386,14 @@ void PrintVariousThings() {
   // Serial.print(", ");
   // Serial.print("UpperArm roricon initialized:");
   // Serial.print(kodaioh_shoulder::UpperArmRoriconInitialised ? "true" :
-  "false");
+  // "false");
   // Serial.print(", ");
   // Serial.print("UpperArm Manipulate Value:");
   // Serial.print(UpperArmManipulateValue);
   // Serial.print(", ");
   // Serial.print("UpperArm Angle Deg:");
   // Serial.print(kodaioh_shoulder::SensorStates.UpperArmRotationRad *
-  RAD_TO_DEG);
+  // RAD_TO_DEG);
   // Serial.print(", ");
   // Serial.print("UpperArm Limit Angle Deg:");
   // Serial.print(kodaioh_shoulder::UpperArmLimitAngleRad[0]*RAD_TO_DEG);
@@ -401,10 +411,10 @@ void PrintVariousThings() {
   // kodaioh_shoulder::SensorStates.UpperArmRotationRad)*RAD_TO_DEG);
   // Serial.print(":");
   //
-  Serial.print(kodaioh_shoulder::MotorPower*((kodaioh_shoulder::UpperArmLimitAngleRad[0]
+  // Serial.print(kodaioh_shoulder::MotorPower*((kodaioh_shoulder::UpperArmLimitAngleRad[0]
   // -
   //
-  kodaioh_shoulder::SensorStates.UpperArmRotationRad)/kodaioh_shoulder::UpperArmLimitAngleRad[0]));
+  // kodaioh_shoulder::SensorStates.UpperArmRotationRad)/kodaioh_shoulder::UpperArmLimitAngleRad[0]));
   // Serial.print("\n");
   // Serial.print(", ");
 
@@ -437,4 +447,41 @@ void PrintVariousThings() {
   // Serial.print(kodaioh_shoulder::MotorPower*((ElbowLimitAngleRad[0] -
   // SensorStates.ElbowRotationRad)/ElbowLimitAngleRad[0]));
   // Serial.println("\n");
+}
+
+// @param : +-32,767のPWM値（モータードライバ４ポート分）
+//          上限+-32000程度（ArduinoのAnalogWrite(port,249);と同じくらいの出力：97.65%）にモータードライバ側で勝手に制限↓
+//           （Duty比100%を入力するとブートストラップ回路が動作しなくなってモータドライバが動かないから）
+// @note :
+// 手元の環境的な理由でMySerialを使っています。ESP32用のポートに書き換えて使ったらOKです。
+//          相手側の通信速度は115200で設定しています。もしESP側で同じ速度に設定できなかったら服部に知らせてください。
+void PWM_transmit_via_CAN(int16_t pwm1, int16_t pwm2, int16_t pwm3,
+                          int16_t pwm4) {
+  int16_t pwms[4] = {pwm1, pwm2, pwm3, pwm4};
+  uint8_t pwm_highbyte[4], pwm_lowbyte[4], can_data[8], calc_checksum;
+  static const uint8_t can_id = 3, can_frame_prefix = 0xff,
+                       can_frame_verID = 0xfe;
+  for (uint8_t i = 0; i < 4; i++) {
+    pwm_highbyte[i] = uint8_t(int16_t(pwms[i] >> 8) & 0xff);
+    pwm_lowbyte[i] = uint8_t(pwms[i] & 0xff);
+    can_data[i * 2] = pwm_lowbyte[i];
+    can_data[(i * 2) + 1] = pwm_highbyte[i];
+  }
+  calc_checksum = 255 - (uint16_t(can_id + can_data[0] + can_data[1] +
+                                  can_data[2] + can_data[3] + can_data[4] +
+                                  can_data[5] + can_data[6] + can_data[7]) %
+                         256);
+
+  MySerial.write(can_frame_prefix);
+  MySerial.write(can_frame_verID);
+  MySerial.write(can_id);
+  MySerial.write(can_data[0]);
+  MySerial.write(can_data[1]);
+  MySerial.write(can_data[2]);
+  MySerial.write(can_data[3]);
+  MySerial.write(can_data[4]);
+  MySerial.write(can_data[5]);
+  MySerial.write(can_data[6]);
+  MySerial.write(can_data[7]);
+  MySerial.write(calc_checksum);
 }
