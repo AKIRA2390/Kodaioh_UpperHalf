@@ -1,6 +1,6 @@
 {
     "name":"KodaiohShoulder",
-    "version":"4.5.0",
+    "version":"4.5.1",
     "description":"codes to use Kohdaioh Shoulder",
     "keywords":"Kohdaioh, esp32, esp-now",
     "repository":{

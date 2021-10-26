@@ -12,6 +12,7 @@
 //
 
 #define Debug
+
 typedef struct RightHalfPinmap_t {
   // output pins //
   // plus, minus
@@ -186,11 +187,15 @@ void loop() {
 
     // kodaioh_shoulder::UpdateWhenDirty(ShoulderManipulateValue,
     //                                   UpperArmManipulateValue);
-    const int SCALEFACTOR = 125;
+    
+    const int S_MAXPOWER = 32000, U_MAXPOWER = 32000, E_MAXPOWER = 32000;
+    const int S_SCALEFACTOR = S_MAXPOWER / 255,
+              U_SCALEFACTOR = U_MAXPOWER / 255,
+              E_SCALEFACTOR = E_MAXPOWER / 255;
 
-    PWM_transmit_via_CAN(ShoulderManipulateValue * SCALEFACTOR,
-                         UpperArmManipulateValue * SCALEFACTOR,
-                         ElbowManipulateValue * SCALEFACTOR, 0);
+    PWM_transmit_via_CAN(ShoulderManipulateValue * S_SCALEFACTOR,
+                         UpperArmManipulateValue * U_SCALEFACTOR,
+                         ElbowManipulateValue * E_SCALEFACTOR, 0);
 
     PrintVariousThings();
     kodaioh_shoulder::IsDirty = false;
