@@ -76,8 +76,8 @@ void setPIDGains(PID4Arduino::PIDGain_t ShoulderPIDGains,
 void setup(controlstick::ControlStick *stick,
            controlstick::InputData_t *input_data,
            bool ShoulderRoriconInvert = false,
-           bool UpperArmRoriconInvert = false, bool ShoulderMotorInvert = false,
-           bool UpperArmMotorInvert = false );
+           bool UpperArmRoriconInvert = false, bool Shoulder_Motor_Invert = false,
+           bool UpperArm_Motor_Invert = false );
 void update();
 
 // void UpdateWhenDirty(double ShoulderManipulateValue,

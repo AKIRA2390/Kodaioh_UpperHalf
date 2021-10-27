@@ -74,10 +74,13 @@ void setPIDGains(PID4Arduino::PIDGain_t shoulderPIDGains,
 
 void setup(controlstick::ControlStick *stick,
            controlstick::InputData_t *input_data, bool ShoulderRoriconInvert,
-           bool UpperArmRoriconInvert, bool ShoulderMotorInvert,
-           bool UpperArmMotorInvert) {
+           bool UpperArmRoriconInvert, bool Shoulder_Motor_Invert,
+           bool UpperArm_Motor_Invert) {
   Stick = stick;
   InputData = input_data;
+
+  ShoulderMotorInvert = Shoulder_Motor_Invert;
+  UpperArmMotorInvert = UpperArm_Motor_Invert;
 
   Stick->ThisReceives(RecvCB);
   Stick->SetupConnection();
