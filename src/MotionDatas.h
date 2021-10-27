@@ -11,6 +11,7 @@ extern motionmanager::MovementsData_t ThrowTheSwordAway;
 extern motionmanager::MovementsData_t TakeThePose;
 extern motionmanager::MovementsData_t OperationCheck_Left;
 extern motionmanager::MovementsData_t RocketPunch;
+extern motionmanager::MovementsData_t RocketPunch_Reset;
 extern motionmanager::MovementsData_t Empty;
 void setup();
 }
