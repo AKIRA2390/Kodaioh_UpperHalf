@@ -24,7 +24,7 @@
         "include":[
             "library.json",
             "src/KodaiohShoulder.*",
-            "src/MotionManager.*",
+            "src/Motion*",
             "src/AxialMovement.*"
         ]
     }
