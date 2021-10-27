@@ -28,6 +28,7 @@ const double UpperArmLimitAngleRad[2] = {90 * DEG_TO_RAD, 0 * DEG_TO_RAD};
 
 bool IsDirty = false;
 bool ShoulderRoriconInitialised = false, UpperArmRoriconInitialised = false;
+bool ShoulderMotorInvert = false, UpperArmMotorInvert = false;
 
 AMT102V *ShoulderRoricon, *UpperArmRoricon;
 
@@ -73,7 +74,8 @@ void setPIDGains(PID4Arduino::PIDGain_t shoulderPIDGains,
 
 void setup(controlstick::ControlStick *stick,
            controlstick::InputData_t *input_data, bool ShoulderRoriconInvert,
-           bool UpperArmRoriconInvert) {
+           bool UpperArmRoriconInvert, bool ShoulderMotorInvert,
+           bool UpperArmMotorInvert) {
   Stick = stick;
   InputData = input_data;
 
@@ -185,7 +187,8 @@ void update() {
 
 //         analogWrite(Pinmap.ShoulderMotors[0], abs(ShoulderManipulateValue));
 //         digitalWrite(Pinmap.ShoulderMotors[1], HIGH);
-//         // analogWrite(Pinmap.ShoulderMotors[0], abs(ShoulderManipulateValue));
+//         // analogWrite(Pinmap.ShoulderMotors[0],
+//         abs(ShoulderManipulateValue));
 //         // analogWrite(Pinmap.ShoulderMotors[1], 0);
 //       } else {
 //         Serial.print("Shoulder_OV:");
@@ -205,7 +208,8 @@ void update() {
 //         analogWrite(Pinmap.ShoulderMotors[0], abs(ShoulderManipulateValue));
 //         digitalWrite(Pinmap.ShoulderMotors[1], LOW);
 //         // analogWrite(Pinmap.ShoulderMotors[0], 0);
-//         // analogWrite(Pinmap.ShoulderMotors[1], abs(ShoulderManipulateValue));
+//         // analogWrite(Pinmap.ShoulderMotors[1],
+//         abs(ShoulderManipulateValue));
 //       } else
 //         Serial.print("Shoulder_OV:");
 //       Serial.print(0);
@@ -261,7 +265,8 @@ void update() {
 //         Serial.print(", ");
 //         // Serial.println(":minus");
 //         // analogWrite(Pinmap.UpperArmMotors[0], 0);
-//         // analogWrite(Pinmap.UpperArmMotors[1], abs(UpperArmManipulateValue));
+//         // analogWrite(Pinmap.UpperArmMotors[1],
+//         abs(UpperArmManipulateValue));
 //       }
 //     }
 //   } else {
@@ -318,6 +323,9 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
   //     ((UpperArmLimitAngleRad[0] - SensorStates.UpperArmRotationRad)
   //     /
   //      UpperArmLimitAngleRad[0]);
+
+  if (ShoulderMotorInvert) *ShoulderManipulateValue *= -1;
+  if (UpperArmMotorInvert) *UpperArmManipulateValue *= -1;
 }
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue) {
@@ -325,6 +333,9 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
       InputData->StickStates[1] * InputData->Slider * ShoulderMotorPower;
   *UpperArmManipulateValue =
       InputData->StickStates[0] * InputData->Slider * UpperArmMotorPower;
+
+  if (ShoulderMotorInvert) *ShoulderManipulateValue *= -1;
+  if (UpperArmMotorInvert) *UpperArmManipulateValue *= -1;
 }
 
 void UpdateTaishinMethod(double *ShoulderManipulateValue,
@@ -333,6 +344,9 @@ void UpdateTaishinMethod(double *ShoulderManipulateValue,
 
   *ShoulderManipulateValue = ShoulderPID.GetValue();
   *UpperArmManipulateValue = UpperArmPID.GetValue();
+  
+  if (ShoulderMotorInvert) *ShoulderManipulateValue *= -1;
+  if (UpperArmMotorInvert) *UpperArmManipulateValue *= -1;
 }
 
 void Update4ShoulderUnitReset(double *ShoulderManipulateValue,
@@ -354,6 +368,9 @@ void Update4ShoulderUnitReset(double *ShoulderManipulateValue,
   }
 
   *UpperArmManipulateValue = -UpperArmMotorPower;
+  
+  if (ShoulderMotorInvert) *ShoulderManipulateValue *= -1;
+  if (UpperArmMotorInvert) *UpperArmManipulateValue *= -1;
 }
 
 void GetBothHandsData(controlstick::BothHandsData_t *Value) {
