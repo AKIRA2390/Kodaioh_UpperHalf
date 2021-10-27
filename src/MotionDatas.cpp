@@ -23,7 +23,7 @@ motionmanager::MovementsData_t RocketPunch;
 motionmanager::MovementsData_t Empty;
 
 void setup() {
-  Serial.println("Motion Data Setup");
+  // Serial.println("Motion Data Setup");
 
   MakeMove_OperationCheck_Right();
   MakeMove_SwingTheSword();
@@ -44,7 +44,9 @@ void MakeMove_TakeThePose() {}
 void MakeMove_OperationCheck_Left() {}
 void MakeMove_RocketPunch() {}
 void MakeMove_Empty() {
-  motionmanager::addMove(Empty.Shoulder, 0, 90, 5000);
-  motionmanager::addMove(Empty.Shoulder, 90, 0, 5000);
+  motionmanager::addMove(Empty.Elbow, 0, 90, 5000);
+  motionmanager::addMove(Empty.Elbow, 90, 90, 5000);
+  motionmanager::addMove(Empty.Elbow, 90, 0, 5000);
+  motionmanager::addMove(Empty.Elbow, 0, 0, 5000);
 }
 }  // namespace motion_datas

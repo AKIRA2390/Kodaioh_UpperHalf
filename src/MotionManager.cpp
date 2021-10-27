@@ -25,6 +25,9 @@ void MotionManager::setup(int *shoulder_TD, int *upper_arm_TD, int *elbow_TD) {
 
 void MotionManager::update(AngleDatas_t angle_datas) {
   if (MovementInProgress) {
+    // Serial.print("ShoulderRotationDeg:");
+    // Serial.print(angle_datas.ShoulderRotationDeg);
+    // Serial.print(", ");
     Shoulder.update(angle_datas.ShoulderRotationDeg, ShoulderTD);
     UpperArm.update(angle_datas.UpperArmRotationDeg, UpperArmTD);
     if (HasElbow) {

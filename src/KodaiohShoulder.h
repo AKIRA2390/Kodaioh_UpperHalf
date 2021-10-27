@@ -83,14 +83,14 @@ void update();
 // void UpdateWhenDirty(double ShoulderManipulateValue,
 //                      double UpperArmManipulateValue);
 
-void UpdateTestDummy(double *ShoulderManipulateValue,
-                     double *UpperArmManipulateValue,
+void UpdateTestDummy(int16_t *ShoulderManipulateValue,
+                     int16_t *UpperArmManipulateValue,
                      bool ShoulderTesting = false,
                      bool UpperArmTesting = false);
 void UpdateAKIRAMethod(double *ShoulderManipulateValue,
                        double *UpperArmManipulateValue);
-void UpdateTaishinMethod(double *ShoulderManipulateValue,
-                         double *UpperArmManipulateValue);
+void UpdateTaishinMethod(int16_t *ShoulderManipulateValue,
+                         int16_t *UpperArmManipulateValue);
 
 void Update4ShoulderUnitReset(double *ShoulderManipulateValue,
                               double *UpperArmManipulateValue);

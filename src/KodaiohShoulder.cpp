@@ -131,6 +131,7 @@ void update() {
   if (SensorStates.ShoulderLimit) {
     ShoulderRoriconInitialised = true;
     ShoulderRoricon->resetRotation();
+    SensorStates.ShoulderRotationRad = 0;
   }
 
   if (SensorStates.UpperArmLimit[1]) {
@@ -161,9 +162,15 @@ void update() {
   SensorStates.UpperArmRoriconRotationPrev =
       UpperArmRoricon->getRotationsDouble();
 
+  // Serial.print("ShoulderTD:");
+  // Serial.print(ShoulderTargetDeg);
+  // Serial.print(", ");
+  // Serial.print("UpperArmTD:");
+  // Serial.print(UpperArmTargetDeg);
+  // Serial.print(", ");
   //
-  ShoulderPID.update(ShoulderTargetDeg, SensorStates.ShoulderRotationRad);
-  UpperArmPID.update(UpperArmTargetDeg, SensorStates.UpperArmRotationRad);
+  ShoulderPID.update(ShoulderTargetDeg, (SensorStates.ShoulderRotationRad)*RAD_TO_DEG);
+  UpperArmPID.update(UpperArmTargetDeg, (SensorStates.UpperArmRotationRad)*RAD_TO_DEG);
   //
 }
 
@@ -283,8 +290,8 @@ void update() {
 //   }
 // }
 
-void UpdateTestDummy(double *ShoulderManipulateValue,
-                     double *UpperArmManipulateValue, bool ShoulderTesting,
+void UpdateTestDummy(int16_t *ShoulderManipulateValue,
+                     int16_t *UpperArmManipulateValue, bool ShoulderTesting,
                      bool UpperArmTesting) {
   static bool ShoulderDirection = false, UpperArmDirection = true;
 
@@ -295,14 +302,29 @@ void UpdateTestDummy(double *ShoulderManipulateValue,
   // Serial.println(UpperArmDirection);
   // Serial.println("//////////////////////////");
 
-  if (SensorStates.ShoulderRotationRad > ShoulderLimitAngleRad[0]) {
+  if (ShoulderDirection &&
+      SensorStates.ShoulderRotationRad > ShoulderLimitAngleRad[0]) {
+    // Serial.print("Shoulder_MaxT:");
+    // Serial.print(millis());
+    // Serial.print(", ");
+    // Serial.println(" ");
     ShoulderDirection = false;
-  } else if (ShoulderLimitAngleRad[1] > SensorStates.ShoulderRotationRad) {
+  } else if (!ShoulderDirection &&
+             ShoulderLimitAngleRad[1] > SensorStates.ShoulderRotationRad) {
+    // Serial.print("Shoulder_MinT:");
+    // Serial.print(millis());
+    // Serial.print(", ");
     ShoulderDirection = true;
   }
-  if (SensorStates.UpperArmLimit[0]) {
+  if (UpperArmDirection && SensorStates.UpperArmLimit[0]) {
+    // Serial.print("UpperArm_MaxT:");
+    // Serial.print(millis());
+    // Serial.print(", ");
     UpperArmDirection = false;
-  } else if (SensorStates.UpperArmLimit[1]) {
+  } else if (!UpperArmDirection && SensorStates.UpperArmLimit[1]) {
+    // Serial.print("UpperArm_MinT:");
+    // Serial.print(millis());
+    // Serial.print(", ");
     UpperArmDirection = true;
   }
 
@@ -341,13 +363,13 @@ void UpdateAKIRAMethod(double *ShoulderManipulateValue,
   if (UpperArmMotorInvert) *UpperArmManipulateValue *= -1;
 }
 
-void UpdateTaishinMethod(double *ShoulderManipulateValue,
-                         double *UpperArmManipulateValue) {
+void UpdateTaishinMethod(int16_t *ShoulderManipulateValue,
+                         int16_t *UpperArmManipulateValue) {
   // ShoulderTargetDeg = 20;
 
   *ShoulderManipulateValue = ShoulderPID.GetValue();
   *UpperArmManipulateValue = UpperArmPID.GetValue();
-  
+
   if (ShoulderMotorInvert) *ShoulderManipulateValue *= -1;
   if (UpperArmMotorInvert) *UpperArmManipulateValue *= -1;
 }
@@ -371,7 +393,7 @@ void Update4ShoulderUnitReset(double *ShoulderManipulateValue,
   }
 
   *UpperArmManipulateValue = -UpperArmMotorPower;
-  
+
   if (ShoulderMotorInvert) *ShoulderManipulateValue *= -1;
   if (UpperArmMotorInvert) *UpperArmManipulateValue *= -1;
 }
