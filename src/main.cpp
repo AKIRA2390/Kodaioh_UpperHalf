@@ -94,23 +94,14 @@ void setup() {
 
   //
   ShoulderPIDGain.KP = 8;
-  // kodaioh_shoulder::ShoulderMotorPower /
-  // (abs(kodaioh_shoulder::ShoulderLimitAngleRad[0] * RAD_TO_DEG) +
-  //  abs(kodaioh_shoulder::ShoulderLimitAngleRad[1] * RAD_TO_DEG));
   ShoulderPIDGain.KI = 0;
   ShoulderPIDGain.KD = 0;
 
   UpperArmPIDGain.KP = 8;
-  // kodaioh_shoulder::UpperArmMotorPower /
-  // (abs(kodaioh_shoulder::UpperArmLimitAngleRad[0] * RAD_TO_DEG) +
-  //  abs(kodaioh_shoulder::UpperArmLimitAngleRad[1] * RAD_TO_DEG));
   UpperArmPIDGain.KI = 0;
   UpperArmPIDGain.KD = 0;
 
   ElbowPIDGain.KP = 2;
-  // ElbowMotorPower / (abs(ElbowLimitAngleRad[0] * RAD_TO_DEG) +
-  //                                      abs(ElbowLimitAngleRad[1] *
-  //                                      RAD_TO_DEG));
   ElbowPIDGain.KI = 0;
   ElbowPIDGain.KD = 0;
 
