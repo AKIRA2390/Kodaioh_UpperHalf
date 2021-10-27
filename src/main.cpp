@@ -12,6 +12,7 @@
 //
 
 #define Debug
+#define IsRightHalf
 
 typedef struct RightHalfPinmap_t {
   // output pins //
@@ -348,29 +349,20 @@ void UpdateTaishinMethod(int16_t *ShoulderManipulateValue,
   kodaioh_shoulder::IsDirty = true;
   kodaioh_shoulder::SensorStates.ShoulderLimit = true;
 #else
+// #endif
 
   if (!Motion.IsBusy()) {
     if (BothHandsData.RightStick.ButtonState[0])
-      Motion.StartMove(motion_datas::Empty);
+      Motion.StartMove(motion_datas::OperationCheck_Right);
     if (BothHandsData.RightStick.ButtonState[1])
-      Motion.StartMove(motion_datas::Empty);
+      Motion.StartMove(motion_datas::SwingTheSword);
     if (BothHandsData.RightStick.ButtonState[2])
-      Motion.StartMove(motion_datas::Empty);
+      Motion.StartMove(motion_datas::SwordBatteryDown);
     if (BothHandsData.RightStick.ButtonState[3])
-      Motion.StartMove(motion_datas::Empty);
+      Motion.StartMove(motion_datas::ThrowTheSwordAway);
     if (BothHandsData.RightStick.ButtonState[4])
-      Motion.StartMove(motion_datas::Empty);
+      Motion.StartMove(motion_datas::TakeThePose);
 
-    if (BothHandsData.LeftStick.ButtonState[0])
-      Motion.StartMove(motion_datas::Empty);
-    if (BothHandsData.LeftStick.ButtonState[1])
-      Motion.StartMove(motion_datas::Empty);
-    if (BothHandsData.LeftStick.ButtonState[2])
-      Motion.StartMove(motion_datas::Empty);
-    if (BothHandsData.LeftStick.ButtonState[3])
-      Motion.StartMove(motion_datas::Empty);
-    if (BothHandsData.LeftStick.ButtonState[4])
-      Motion.StartMove(motion_datas::Empty);
   }
 #endif
 

@@ -27,6 +27,7 @@ class MotionManager {
   MotionManager(bool hasElbow);
   ~MotionManager(){};
   void setup(int *shoulder_TD, int *upper_arm_TD, int *elbow_TD);
+  void setup(int *shoulder_TD, int *upper_arm_TD);
   void update(AngleDatas_t angle_datas);
 
   void StartMove(MovementsData_t movement_datas);
